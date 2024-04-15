@@ -1,5 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod printer;
+mod auth;
+
 use standard_paths::{LocationType, StandardPaths};
 use std::{fs, path::PathBuf, sync::OnceLock};
 
@@ -15,6 +18,8 @@ fn main() {
     .expect("Could not create app config directory");
 
   tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![printer::printer_list])
+    .invoke_handler(tauri::generate_handler![auth::login])
     .run(tauri::generate_context!())
     .expect("Could not start application");
 }
