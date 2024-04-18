@@ -1,0 +1,222 @@
+{
+  "common": {
+    "currency": "DH",
+    "percent": "%",
+    "action": {
+      "remove": "Supprimer",
+      "save": "Sauvegarder",
+      "modify": "Modifier",
+      "view": "Voir"
+    },
+    "success": {
+      "deleted": "Supprimé",
+      "updated": "Mis à jour"
+    },
+    "error": {
+      "unauthorized": "Operation non autorisée",
+      "unknown": "Erreur Inconnue",
+      "notFound": "Resource non trouvé",
+      "invalidParams": "Paramètres invalides",
+      "unableToLoad": "Erreur de chargement",
+      "invalidNum": "Nombre Invalide",
+      "invalidEnum": "Valeur Invalide",
+      "invalidString": "Valeur Invalide",
+      "invalidName": "Nom Invalide",
+      "usedName": "Nom déjà utilisé",
+      "alreadyExists": "Existe déjà"
+    },
+    "nav": {
+      "back": "Retour",
+      "next": "Suivant"
+    },
+    "dialog": {
+      "yes": "Oui",
+      "no": "Non"
+    },
+    "autocomplete": {
+      "loading": "Chargement...",
+      "startTyping": "Commencer à écrire pour voir des résultats...",
+      "noResults": "Pas de résultats pour '{query}'"
+    },
+    "dataModel": {
+      "id": "ID",
+      "name": "Nom",
+      "createdAt": "Crée le",
+      "updatedAt": "Mis à jour le",
+      "createdBy": "Crée par"
+    }
+  },
+  "access": {
+    "title": "Clé d'accès requis. Contacter l'administrateur du système.",
+    "token": "Clé d'accès",
+    "submit": "Envoyer"
+  },
+  "hardwareConfig":{
+    "title": "Configuration du système"
+  },
+  "login": {
+    "title": "Qui utilise le système?",
+    "logout": "Se déconnecter",
+    "loginAs": "Connexion autant que {username}",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "error": {
+      "credentials": "Mot de passe invalide",
+      "connectionLost": "Connection perdue",
+      "nosetup": "Aucun caissier trouvé. Contacter l'administrateur du système pour activer la caisse."
+    }
+  },
+  "dashboard": {
+    "title": "Tartelette by Ikram",
+    "mainNav": {
+      "cashreg": "Caisse",
+      "sessions": "Sessions",
+      "customers": "Clients",
+      "products": "Produits",
+      "rawMats": "Matières premières",
+      "locations": "Locaux",
+      "stock": "Stock",
+      "cashiers": "Caissiers",
+      "accessTokens": "Clés d'accès",
+      "globalSettings": "Paramètres Globals",
+      "transactions": "Transactions"
+    }
+  },
+  "cashreg": {
+    "taxPercent": "TVA",
+    "reduction": "Remise",
+    "reductionType": "Type",
+    "coupon": "Coupons",
+    "nocoupon": "Aucun Coupon",
+    "totalPriceExclTax": "Prix Total HT",
+    "totalPriceInclTax": "Prix Total TTC",
+    "payed": "Payé",
+    "returned": "Retourné",
+    "customer": "Client",
+    "nocustomer": "Aucun Client",
+    "product": "Produit",
+    "quantity": "Quantité",
+    "add": "Ajouter",
+    "validate": "Valider"
+  },
+  "resourcePage": {
+    "add": "Ajouter {name}",
+    "search": "Rechercher {name}",
+    "delete": {
+      "title": "Êtes-vous sûr de vouloir supprimer {name}"
+    }
+  },
+  "products": {
+    "name": "produit",
+    "namePlural": "produits",
+    "newTitle": "Ajouter un produit",
+    "created": "Produit ajouté",
+    "rawMat": {
+      "editPageTitle": "Matières premières de {name}",
+      "name": "Matière premiere",
+      "namePlural": "Matières premieres",
+      "dataModel": {
+        "quantityPerUnit": "Quantité / Unité"
+      }
+    },
+    "dataModel": {
+      "barcode": "Barcode",
+      "price": "Prix",
+      "stock": "Stock"
+    },
+    "error": {
+      "invalidPrice": "Prix Invalide",
+      "barcodeUsed": "Barcode déjà utilisé"
+    }
+  },
+  "rawMats": {
+    "name": "matière première",
+    "namePlural": "matières premières",
+    "newTitle": "Ajouter une matière première",
+    "created": "Matière première ajoutée",
+    "dataModel": {
+      "unitName": "Unité",
+      "unitPrice": "Prix d'unité"
+    }
+  },
+  "transactions": {
+    "item": {
+      "price": "Prix",
+      "quantity": "Quantité",
+      "totalPrice": "Prix total"
+    },
+    "includeTax": "Inclure TVA",
+    "receipt": {
+      "title": "Tartelette by Ikram",
+      "date": "Date: {date}",
+      "cashier": "Caissier: {cashier}",
+      "customer": "Client: {customer}",
+      "transactionN": "Transaction Nº {n}",
+      "notice": "Nos produits ne sont ni remboursables ni échangeables.",
+      "thanks": "Merci pur votre visite",
+      "coupons": "Coupons",
+      "items": "Articles"
+    },
+    "success": "Transaction validée",
+    "error": {
+      "productRef": "Référence à un produit non-existant",
+      "invalidQuantity": "Quantité Invalide",
+      "couponRef": "Référence a un coupon non-existant"
+    },
+    "page": {
+      "title": "Transactions",
+      "queryLabel": "Rechercher par numéro de transaction",
+      "loading": "Chargement...",
+      "openTransaction": "Ouvrir",
+      "view": {
+        "genInvoice": "Générer la facture",
+        "viewInvoice": "Voir facture",
+        "viewReceipt": "Voir reçu"
+      }
+    }
+  },
+  "customers": {
+    "name": "Client",
+    "namePlural": "Clients",
+    "created": "Client ajouté",
+    "newTitle": "Ajouter client",
+    "dataModel": {
+      "ICE": "ICE",
+      "RC": "RC",
+      "comment": "Note",
+      "deliveryAddress": "Adresse de livraison",
+      "phone": "Téléphone"
+    }
+  },
+  "locations": {
+    "name": "Local",
+    "namePlural": "Locaux",
+    "newTitle": "Ajouter local",
+    "created": "Local ajouté"
+  },
+  "stock": {
+    "title": "Stock",
+    "addLocation": "Ajouter local",
+    "addProduct": "Ajouter produit",
+    "titleLocation": "Stock dans {locationName}",
+    "titleProduct": "Stock de {productName}"
+  },
+  "sessions": {
+    "title": "Sessions de {name}",
+    "dataModel": {
+      "loginTime": "Heure de début",
+      "logoutTime": "Heure de fin"
+    }
+  },
+  "cashStatement": {
+    "cashier": "Caissier: {name}",
+    "title": "Arrêt de caisse",
+    "between": "Entre {start} et {end}",
+    "transactionTime": "Temps de transaction",
+    "transactionId": "ID",
+    "transactionCustomer": "Client",
+    "transactionTotal": "Total",
+    "allTotal": "Total: {total} {currency}"
+  }
+}
