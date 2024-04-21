@@ -13,6 +13,7 @@ import Login from "./routes/config/Login";
 import DashboardLayout from "./layouts/DashboardLayout";
 import CashRegister from "./routes/dashboard/CashRegister";
 
+
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path='/' loader={rootRedirect} />,
