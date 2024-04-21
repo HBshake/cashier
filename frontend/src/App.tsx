@@ -12,6 +12,7 @@ import ProfileSelector from "./routes/config/ProfileSelector";
 import Login from "./routes/config/Login";
 import DashboardLayout from "./layouts/DashboardLayout";
 import CashRegister from "./routes/dashboard/CashRegister";
+import Customer from "./routes/dashboard/Customer";
 
 
 const router = createBrowserRouter(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       </Route>
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route path="cashreg" element={<CashRegister />} />
+        <Route path="customer" element={<Customer/>}/>
       </Route>
     </Route>,
   ]),
