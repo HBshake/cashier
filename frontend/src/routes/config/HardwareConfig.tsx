@@ -10,8 +10,8 @@ export default function HardwareConfig() {
     <Stack height='100%' justifyContent='space-between'>
       <Stack gap={2}>
         <Typography variant='h4'>{dict.hardwareConfig.title}</Typography>
-        <SettingRow title='Imprimente pricipal' options={printers} />
-        <SettingRow title='Imprimente de reçu' options={printers} />
+        <SettingRow title='Imprimante principal' options={printers} />
+        <SettingRow title='Imprimante de reçu' options={printers} />
       </Stack>
       <Stack alignItems='end'>
         <Button href='/login'>{dict.common.nav.next}</Button>
