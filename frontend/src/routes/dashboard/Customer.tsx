@@ -54,13 +54,13 @@ export default function CustomerPage() {
           <List component='div' disablePadding>
             <ListItemButton sx={{ pl: 4 }}>
               <Stack spacing={2}>
-                <ListItemText primary='Name :' />
+                <ListItemText primary='Nom :' />
                 <ListItemText primary='ICE' />
                 <ListItemText primary='RC' />
-                <ListItemText primary='Delivery Adress' />
-                <ListItemText primary='Phone' />
-                <ListItemText primary='Comment' />
-                <ListItemText primary='Created at :' />
+                <ListItemText primary='Adresse de livraison' />
+                <ListItemText primary='Téléphone' />
+                <ListItemText primary='Commentaire' />
+                <ListItemText primary='Crée le  :' />
               </Stack>
             </ListItemButton>
           </List>
