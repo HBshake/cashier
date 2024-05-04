@@ -8,18 +8,18 @@ use crate::CONNECION;
 struct Customer{
     id: i32,
     name: String,
-    ICE: Option<String>,
-    RC: Option<String>, 
-    deliveryAddress: Option<String>,
+    ice: Option<String>,
+    rc: Option<String>, 
+    delivery_address: Option<String>,
     phone: Option<String>,
     comment: Option<String>,
-    createdAt: NaiveDateTime,
+    created_at: NaiveDateTime,
 }
 
 #[get("/")]
 async fn list() -> Json<Vec<Customer>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let customers = sqlx::query_as!(Customer, r#"SELECT * FROM "Customer""#)
+  let customers = sqlx::query_as!(Customer, r#"SELECT * FROM customer"#)
     .fetch_all(connection.as_mut())
     .await
     .unwrap();
