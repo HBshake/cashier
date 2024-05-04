@@ -83,7 +83,7 @@ const nav: NavDestination[] = [
   {
     name: "rawMats",
     icon: Layers,
-    route: "rawmat",
+    route: "Matière_Première",
   },
   {
     name: "transactions",

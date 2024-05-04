@@ -13,6 +13,7 @@ import Login from "./routes/config/Login";
 import DashboardLayout from "./layouts/DashboardLayout";
 import CashRegister from "./routes/dashboard/CashRegister";
 import CustomerPage from "./routes/dashboard/Customer";
+import RawMaterialPage from "./routes/dashboard/Matière_Première";
 
 
 const router = createBrowserRouter(
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route path="cashreg" element={<CashRegister />} />
         <Route path="customer" element={<CustomerPage/>}/>
+        <Route path="Matière_Première" element={<RawMaterialPage/>}/>
       </Route>
     </Route>,
   ]),
