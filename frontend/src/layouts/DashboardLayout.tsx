@@ -58,7 +58,7 @@ const nav: NavDestination[] = [
   {
     name: "sessions",
     icon: AccessTime,
-    route: "sessions",
+    route: "Session",
   },
   {
     name: "customers",
