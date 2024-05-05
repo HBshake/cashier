@@ -13,10 +13,9 @@ import Login from "./routes/config/Login";
 import DashboardLayout from "./layouts/DashboardLayout";
 import CashRegister from "./routes/dashboard/CashRegister";
 import CustomerPage from "./routes/dashboard/Customer";
-import RawMaterialPage from "./routes/dashboard/Matière_Première";
+import RawMaterialPage from "./routes/dashboard/RawMaterial";
 import SessionPage from "./routes/dashboard/Session";
 import ProductPage from "./routes/dashboard/Product";
-
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -25,14 +24,14 @@ const router = createBrowserRouter(
       <Route element={<ConfigLayout />}>
         <Route path='/hardware-cfg' element={<HardwareConfig />} />
         <Route path='/login' element={<ProfileSelector />} />
-        <Route path="/login/:username/:displayName" element={<Login />} />
+        <Route path='/login/:username/:displayName' element={<Login />} />
       </Route>
-      <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route path="cashreg" element={<CashRegister />} />
-        <Route path="customer" element={<CustomerPage/>}/>
-        <Route path="Matière_Première" element={<RawMaterialPage/>}/>
-        <Route path="Session" element={<SessionPage/>}/>
-        <Route path="Product" element={<ProductPage/>}/>
+      <Route path='/dashboard' element={<DashboardLayout />}>
+        <Route path='cashreg' element={<CashRegister />} />
+        <Route path='customer' element={<CustomerPage />} />
+        <Route path='raw-material' element={<RawMaterialPage />} />
+        <Route path='Session' element={<SessionPage />} />
+        <Route path='Product' element={<ProductPage />} />
       </Route>
     </Route>,
   ]),
