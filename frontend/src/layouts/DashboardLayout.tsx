@@ -58,7 +58,7 @@ const nav: NavDestination[] = [
   {
     name: "sessions",
     icon: AccessTime,
-    route: "sessions",
+    route: "Session",
   },
   {
     name: "customers",
@@ -68,7 +68,7 @@ const nav: NavDestination[] = [
   {
     name: "products",
     icon: CategoryIcon,
-    route: "products",
+    route: "Product",
   },
   {
     name: "locations",
@@ -83,7 +83,7 @@ const nav: NavDestination[] = [
   {
     name: "rawMats",
     icon: Layers,
-    route: "rawmat",
+    route: "Matière_Première",
   },
   {
     name: "transactions",
