@@ -2,9 +2,11 @@
 extern crate rocket;
 
 mod routes;
+pub mod data;
 
 use std::{env, sync::OnceLock};
 
+use bcrypt::DEFAULT_COST;
 use rocket::tokio::sync::Mutex;
 use routes::InitializeRoutes;
 use sqlx::{Connection, PgConnection};
