@@ -1,19 +1,19 @@
+use chrono::NaiveDateTime;
 use rocket::{serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
 
 use crate::CONNECION;
 
 #[derive(Serialize, Deserialize)]
-struct Customer{
-    id: i32,
-    name: String,
-    ice: Option<String>,
-    rc: Option<String>, 
-    delivery_address: Option<String>,
-    phone: Option<String>,
-    comment: Option<String>,
-    created_at: NaiveDateTime,
+struct Customer {
+  id: i32,
+  name: String,
+  ice: Option<String>,
+  rc: Option<String>,
+  delivery_address: Option<String>,
+  phone: Option<String>,
+  comment: Option<String>,
+  created_at: NaiveDateTime,
 }
 
 #[get("/")]
