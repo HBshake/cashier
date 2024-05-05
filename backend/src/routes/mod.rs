@@ -1,9 +1,10 @@
 use rocket::{Build, Rocket, Route};
 
-use self::{auth::auth_routes, customer::customer_routes};
+use self::{auth::auth_routes, customer::customer_routes, product::product_routes};
 
 pub mod auth;
 pub mod customer;
+pub mod product;
 
 #[get("/")]
 fn index() -> &'static str {
@@ -23,5 +24,6 @@ impl InitializeRoutes for Rocket<Build> {
       .mount("/", root_routes())
       .mount("/auth", auth_routes())
       .mount("/customer", customer_routes())
+      .mount("/product", product_routes())
   }
 }
