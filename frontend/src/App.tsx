@@ -16,6 +16,11 @@ import CustomerPage from "./routes/dashboard/Customer";
 import RawMaterialPage from "./routes/dashboard/RawMaterial";
 import SessionPage from "./routes/dashboard/Session";
 import ProductPage from "./routes/dashboard/Product";
+<<<<<<< HEAD
+import { printerList } from "./utils/hardware";
+import { configGet, configUnset } from "./utils/config";
+=======
+>>>>>>> origin/main
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -29,7 +34,11 @@ const router = createBrowserRouter(
       <Route path='/dashboard' element={<DashboardLayout />}>
         <Route path='cashreg' element={<CashRegister />} />
         <Route path='customer' element={<CustomerPage />} />
+<<<<<<< HEAD
+        <Route path='Matière_Première' element={<RawMaterialPage />} />
+=======
         <Route path='raw-material' element={<RawMaterialPage />} />
+>>>>>>> origin/main
         <Route path='Session' element={<SessionPage />} />
         <Route path='Product' element={<ProductPage />} />
       </Route>
@@ -38,7 +47,25 @@ const router = createBrowserRouter(
 );
 
 async function rootRedirect() {
-  return redirect("/hardware-cfg");
+  const printers = await printerList();
+  const mainPrinter = await configGet("printer_main");
+  const receiptPrinter = await configGet("printer_receipt");
+
+  const mainPrinterSetup = mainPrinter !== null && printers.includes(mainPrinter);
+  const receiptPrinterSetup = receiptPrinter !== null && printers.includes(receiptPrinter);
+  const hardwareSetup = mainPrinter && receiptPrinter;
+
+  if(!mainPrinterSetup) {
+    configUnset("printer_main");
+  }
+  if(!receiptPrinterSetup) {
+    configUnset("printer_receipt");
+  }
+
+  if(!hardwareSetup) {
+    return redirect("/hardware-cfg");
+  }
+  return redirect("/login");
 }
 
 export default function App() {

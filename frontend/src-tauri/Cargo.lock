@@ -242,11 +242,13 @@ dependencies = [
 name = "cashier-frontend"
 version = "0.0.0"
 dependencies = [
+ "printers",
  "serde",
  "serde_json",
  "standard_paths",
  "tauri",
  "tauri-build",
+ "toml 0.8.12",
 ]
 
 [[package]]
@@ -2138,6 +2140,15 @@ name = "precomputed-hash"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
+
+[[package]]
+name = "printers"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "601970f11a0c22e37e10f0e7432c4926e714f04f020ad8f87d9784e051311d2d"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "proc-macro-crate"
