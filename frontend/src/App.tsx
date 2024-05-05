@@ -16,7 +16,8 @@ import CustomerPage from "./routes/dashboard/Customer";
 import RawMaterialPage from "./routes/dashboard/Matière_Première";
 import SessionPage from "./routes/dashboard/Session";
 import ProductPage from "./routes/dashboard/Product";
-
+import { printerList } from "./utils/hardware";
+import { configGet, configUnset } from "./utils/config";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -25,21 +26,39 @@ const router = createBrowserRouter(
       <Route element={<ConfigLayout />}>
         <Route path='/hardware-cfg' element={<HardwareConfig />} />
         <Route path='/login' element={<ProfileSelector />} />
-        <Route path="/login/:username/:displayName" element={<Login />} />
+        <Route path='/login/:username/:displayName' element={<Login />} />
       </Route>
-      <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route path="cashreg" element={<CashRegister />} />
-        <Route path="customer" element={<CustomerPage/>}/>
-        <Route path="Matière_Première" element={<RawMaterialPage/>}/>
-        <Route path="Session" element={<SessionPage/>}/>
-        <Route path="Product" element={<ProductPage/>}/>
+      <Route path='/dashboard' element={<DashboardLayout />}>
+        <Route path='cashreg' element={<CashRegister />} />
+        <Route path='customer' element={<CustomerPage />} />
+        <Route path='Matière_Première' element={<RawMaterialPage />} />
+        <Route path='Session' element={<SessionPage />} />
+        <Route path='Product' element={<ProductPage />} />
       </Route>
     </Route>,
   ]),
 );
 
 async function rootRedirect() {
-  return redirect("/hardware-cfg");
+  const printers = await printerList();
+  const mainPrinter = await configGet("printer_main");
+  const receiptPrinter = await configGet("printer_receipt");
+
+  const mainPrinterSetup = mainPrinter !== null && printers.includes(mainPrinter);
+  const receiptPrinterSetup = receiptPrinter !== null && printers.includes(receiptPrinter);
+  const hardwareSetup = mainPrinter && receiptPrinter;
+
+  if(!mainPrinterSetup) {
+    configUnset("printer_main");
+  }
+  if(!receiptPrinterSetup) {
+    configUnset("printer_receipt");
+  }
+
+  if(!hardwareSetup) {
+    return redirect("/hardware-cfg");
+  }
+  return redirect("/login");
 }
 
 export default function App() {
