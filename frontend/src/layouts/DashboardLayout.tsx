@@ -78,7 +78,7 @@ const nav: NavDestination[] = [
   {
     name: "stock",
     icon: Warehouse,
-    route: "stock",
+    route: "Stock",
   },
   {
     name: "rawMats",
