@@ -88,7 +88,7 @@ const nav: NavDestination[] = [
   {
     name: "transactions",
     icon: ConfirmationNumber,
-    route: "transactions",
+    route: "TransactionBoard",
   },
 ];
 
