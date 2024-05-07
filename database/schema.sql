@@ -43,3 +43,15 @@ CREATE TABLE employee (
     name TEXT NOT NULL,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+CREATE TABLE raw_materials_in_shop (
+    raw_material_id SERIAL REFERENCES raw_material (id),
+    shop_id SERIAL REFERENCES shop (id),
+    stock DOUBLE PRECISION NOT NULL, 
+);
+
+CREATE TABLE products_in_shop (
+    product_id SERIAL REFERENCES product (id),
+    shop_id SERIAL REFERENCES shop (id),
+    stock INTEGER NOT NULL, 
+);
