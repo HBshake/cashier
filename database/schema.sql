@@ -9,7 +9,6 @@ CREATE TABLE customer (
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
 CREATE TABLE raw_material (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -31,4 +30,10 @@ CREATE TABLE raw_materials_in_product (
     product_id SERIAL REFERENCES product (id),
     quantity_per_unit DOUBLE PRECISION NOT NULL,
 	PRIMARY KEY (raw_material_id, product_id)
+);
+
+CREATE TABLE shop (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
