@@ -2,6 +2,7 @@
 extern crate rocket;
 
 pub mod data;
+pub mod guards;
 mod routes;
 
 use std::{env, sync::OnceLock};

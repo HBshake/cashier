@@ -1,16 +1,15 @@
 import { Body, ResponseType, fetch } from "@tauri-apps/api/http";
 import { SERVER_URL } from "./env";
-import { configGet } from "./config";
-
-let currentSession: string | null = null;
+import { configGet, configSet } from "./config";
 
 export const cashierApi = {
   async get<T>(path: string) {
     const accessToken = await configGet("access_token");
+    const session = await configGet("session");
     if(!accessToken) {
       console.warn("Making request without an access token");
     }
-    if(!currentSession) {
+    if(!session) {
       console.warn("Making request without having a session");
     }
     const url = new URL(path, SERVER_URL).href;
@@ -19,14 +18,18 @@ export const cashierApi = {
       responseType: ResponseType.JSON,
       headers: {
         "X-Access-Token": accessToken ?? "",
-        "X-Session": currentSession ?? "",
+        "X-Session": session ?? "",
       }
     });
   },
   async post<T>(path: string) {
     const accessToken = await configGet("access_token");
+    const session = await configGet("session");
     if(!accessToken) {
       console.warn("Making request without an access token");
+    }
+    if(!session) {
+      console.warn("Making request without having a session");
     }
     const url = new URL(path, SERVER_URL).href;
     return await fetch<T>(url, {
@@ -34,7 +37,7 @@ export const cashierApi = {
       responseType: ResponseType.JSON,
       headers: {
         "X-Access-Token": accessToken ?? "",
-        "X-Session": currentSession ?? "",
+        "X-Session": session ?? "",
       }
     });
   },
@@ -53,7 +56,6 @@ export const cashierApi = {
     }
   },
   async login(username: string, password: string): Promise<boolean> {
-    currentSession = null;
     try {
       const url = new URL("/auth/login", SERVER_URL).href;
       const accessToken = await configGet("access_token");
@@ -74,7 +76,7 @@ export const cashierApi = {
       if(response.status !== 200) {
         return false;
       }
-      currentSession = response.data;
+      await configSet("session", response.data);
       return true;
     } catch(e) {
       return false;

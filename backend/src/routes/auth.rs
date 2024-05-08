@@ -2,10 +2,7 @@ use rocket::{http::Status, serde::json::Json, Route};
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::{
-  data::auth::{AccessToken, Account, StrippedAccount},
-  CONNECION,
-};
+use crate::{data::auth::StrippedAccount, guards::AccessGuard, CONNECION};
 
 #[derive(Deserialize)]
 struct AccessInput {
@@ -21,26 +18,31 @@ struct LoginInput {
 #[post("/access", format = "json", data = "<access>")]
 async fn access(access: Json<AccessInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let token = sqlx::query_as!(
-    AccessToken,
-    "SELECT * FROM access_token WHERE name = $1",
+  let count = sqlx::query!(
+    "SELECT COUNT(*) AS count FROM access_token WHERE name = $1",
     access.token
   )
-  .fetch_optional(&mut *connection)
+  .fetch_one(&mut *connection)
   .await
+  .unwrap()
+  .count
+  .or(Some(0))
   .unwrap();
-  match token {
-    Some(_) => Status::Ok,
-    None => Status::Unauthorized,
+  if count == 1 {
+    Status::Ok
+  } else {
+    Status::Unauthorized
   }
 }
 
 #[post("/login", format = "json", data = "<cred>")]
-async fn login(cred: Json<LoginInput>) -> Result<Json<String>, Status> {
+async fn login(
+  cred: Json<LoginInput>,
+  _access: AccessGuard,
+) -> Result<Json<String>, Status> {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let account = sqlx::query_as!(
-    Account,
-    "SELECT * FROM account WHERE username = $1",
+  let account = sqlx::query!(
+    "SELECT pass_hash FROM account WHERE username = $1",
     cred.username,
   )
   .fetch_optional(&mut *connection)
@@ -51,10 +53,7 @@ async fn login(cred: Json<LoginInput>) -> Result<Json<String>, Status> {
     return Err(Status::Unauthorized);
   }
   let account = account.unwrap();
-  println!("{}", account.pass_hash);
-  println!("{}", cred.password);
   if !bcrypt::verify(cred.password.clone(), &account.pass_hash).unwrap() {
-    println!("Invalid login");
     return Err(Status::Unauthorized);
   }
 
@@ -71,15 +70,18 @@ async fn login(cred: Json<LoginInput>) -> Result<Json<String>, Status> {
 }
 
 #[get("/accounts")]
-async fn list() -> Json<Vec<StrippedAccount>> {
+async fn list(_access: AccessGuard) -> Json<Vec<StrippedAccount>> {
   let mut db = CONNECION.get().unwrap().lock().await;
-  let accounts = sqlx::query_as!(Account, "SELECT * FROM account")
+  let accounts = sqlx::query!("SELECT username, display_name FROM account")
     .fetch_all(&mut *db)
     .await
     .unwrap();
   let stripped_accounts: Vec<_> = accounts
     .iter()
-    .map(|account| StrippedAccount::from(account))
+    .map(|account| StrippedAccount {
+      username: account.username.clone(),
+      display_name: account.display_name.clone(),
+    })
     .collect();
   Json::from(stripped_accounts)
 }
