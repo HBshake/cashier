@@ -22,30 +22,32 @@ type RawMaterial = {
 };
 
 const columns: GridColDef<RawMaterial>[] = [
-  { field: "id", headerName: "ID", width: 90, sortable: false },
+  {
+    field: "id",
+    headerName: "ID",
+    flex: 1,
+  },
   {
     field: "name",
     headerName: "Nom",
-    sortable: false,
+    flex: 4,
   },
   {
     field: "unit_price",
     headerName: "Prix de l'unité (dh)",
-    type: "string",
-    sortable: false,
+    flex: 1,
   },
   {
     field: "unit_name",
     headerName: "Unité",
-    type: "number",
-    sortable: false,
+    flex: 1,
   },
   {
     field: "created_at",
     headerName: "Ajouté le",
     valueFormatter: ({ value }) =>
       dayjs(value as string).format("DD/MM/YYYY HH:mm:ss"),
-    sortable: false,
+    flex: 1,
   },
 ];
 
