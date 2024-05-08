@@ -1,8 +1,8 @@
 use chrono::NaiveDateTime;
 use rocket::{serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
-
 use crate::CONNECION;
+use crate::guards::AuthGuard;
 
 #[derive(Serialize, Deserialize)]
 struct Product {
@@ -15,7 +15,7 @@ struct Product {
 
 
 #[get("/")]
-async fn list() -> Json<Vec<Product>> {
+async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let products = sqlx::query_as!(Product, r#"SELECT * FROM product"#)
     .fetch_all(connection.as_mut())
