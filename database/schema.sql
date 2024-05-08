@@ -69,3 +69,11 @@ CREATE TABLE transaction (
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     created_by TEXT NOT NULL    
 );
+
+CREATE TABLE invoice (
+    id SERIAL PRIMARY KEY,
+    year INTEGER NOT NULL, 
+    blob BYTEA NOT NULL,
+    created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    transaction_id INT NOT NULL REFERENCES transaction (id)
+);
