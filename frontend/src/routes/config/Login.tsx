@@ -2,6 +2,8 @@ import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDict } from "../../hooks/locale";
 import { useCallback, useState } from "react";
+import { cashierApi } from "../../utils/api";
+import { enqueueSnackbar } from "notistack";
 
 export default function Login() {
   const { username, displayName } = useParams();
@@ -10,15 +12,23 @@ export default function Login() {
 
   const [password, setPassword] = useState("");
 
-
-  const attemptLogin = useCallback(() => {
-    navigate("/dashboard/cashreg");
-  }, []);
+  const attemptLogin = useCallback(async () => {
+    if (username && (await cashierApi.login(username, password))) {
+      enqueueSnackbar(`Bonjour ${displayName}`, { variant: "success" });
+      navigate("/dashboard/cashreg");
+    } else {
+      setPassword("");
+      enqueueSnackbar(`Mot de passe incorrecte`, { variant: "error" });
+    }
+  }, [password]);
 
   return (
     <>
       <Typography variant='h4'>
-        {dict.login.loginAs.replaceAll("{username}", displayName ?? username ?? "<unknown>")}
+        {dict.login.loginAs.replaceAll(
+          "{username}",
+          displayName ?? username ?? "<unknown>",
+        )}
       </Typography>
       <Stack direction='column' gap={1}>
         <TextField

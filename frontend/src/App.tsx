@@ -16,6 +16,12 @@ import CustomerPage from "./routes/dashboard/Customer";
 import RawMaterialPage from "./routes/dashboard/RawMaterial";
 import SessionPage from "./routes/dashboard/Session";
 import ProductPage from "./routes/dashboard/Product";
+import { printerList } from "./utils/hardware";
+import { configGet, configUnset } from "./utils/config";
+import ShopPage from "./routes/dashboard/Shop";
+import { cashierApi } from "./utils/api";
+import AccessPage from "./routes/config/Access";
+import { SnackbarProvider } from "notistack";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -23,6 +29,7 @@ const router = createBrowserRouter(
     <Route element={<RootLayout />}>
       <Route element={<ConfigLayout />}>
         <Route path='/hardware-cfg' element={<HardwareConfig />} />
+        <Route path='/access' element={<AccessPage />} />
         <Route path='/login' element={<ProfileSelector />} />
         <Route path='/login/:username/:displayName' element={<Login />} />
       </Route>
@@ -32,15 +39,48 @@ const router = createBrowserRouter(
         <Route path='raw-material' element={<RawMaterialPage />} />
         <Route path='Session' element={<SessionPage />} />
         <Route path='Product' element={<ProductPage />} />
+        <Route path ='shop' element={<ShopPage/>}/>
       </Route>
     </Route>,
   ]),
 );
 
 async function rootRedirect() {
-  return redirect("/hardware-cfg");
+  const printers = await printerList();
+  const mainPrinter = await configGet("printer_main");
+  const receiptPrinter = await configGet("printer_receipt");
+  const accessToken = await configGet("access_token");
+
+  const mainPrinterSetup =
+    mainPrinter !== null && printers.includes(mainPrinter);
+  const receiptPrinterSetup =
+    receiptPrinter !== null && printers.includes(receiptPrinter);
+  const hardwareSetup = mainPrinter && receiptPrinter;
+
+  if (!mainPrinterSetup) {
+    configUnset("printer_main");
+  }
+  if (!receiptPrinterSetup) {
+    configUnset("printer_receipt");
+  }
+
+  if (!hardwareSetup) {
+    return redirect("/hardware-cfg");
+  }
+
+  const accessTokenSetup =
+    accessToken !== null && (await cashierApi.verifyAccessToken(accessToken));
+  if (!accessTokenSetup) {
+    return redirect("/access");
+  }
+
+  return redirect("/login");
 }
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <SnackbarProvider>
+      <RouterProvider router={router} />
+    </SnackbarProvider>
+  );
 }

@@ -9,22 +9,19 @@ import {
   ListItemText,
   Collapse,
   ListItem,
+  CircularProgress,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
-
 import { creationTime } from "../../utils/format";
-import { cashierApi } from "../../utils/api";
+import { useRequest } from "../../hooks/req";
 
 export default function CustomerPage() {
-  const [customers, setCustomers] = React.useState<Customer[]>([]);
+  const [customers,] = useRequest<Customer[]>("/customer");
 
-  const loadCustomers = React.useCallback(async () => {
-    const response = await cashierApi.get<Customer[]>("/customer");
-    setCustomers(response.data);
-  }, []);
-
-  React.useEffect(() => void loadCustomers(), []);
+  if(!customers) {
+    return <CircularProgress />
+  }
 
   return (
     <Stack direction='column'>
