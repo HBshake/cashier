@@ -40,7 +40,7 @@ struct NewRawMaterialInProduct {
 async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let products = sqlx::query_as!(Product, r#"SELECT * FROM product"#)
-    .fetch_all(connection.as_mut())
+    .fetch_all(&mut *connection)
     .await
     .unwrap();
   Json::from(products)
@@ -57,7 +57,7 @@ async fn create(new_product: Json<NewProduct>) -> Status {
     new_product.barcode,
     new_product.price
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await
   .unwrap();
   Status::Created
@@ -73,7 +73,7 @@ async fn list_raw_materials(id: i32) -> Json<Vec<RawMaterialInProduct>> {
     WHERE product_id = $1"#,
     id
   )
-  .fetch_all(connection.as_mut())
+  .fetch_all(&mut *connection)
   .await
   .unwrap();
   Json::from(raw_materials)
@@ -98,7 +98,7 @@ async fn add_raw_material_in_product(
     product_id,
     new_raw_material_in_product.quantity_per_unit
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await
   .unwrap();
 

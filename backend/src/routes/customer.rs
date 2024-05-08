@@ -30,7 +30,7 @@ struct NewCustomer {
 async fn list(_auth: AuthGuard) -> Json<Vec<Customer>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let customers = sqlx::query_as!(Customer, r#"SELECT * FROM customer"#)
-    .fetch_all(connection.as_mut())
+    .fetch_all(&mut *connection)
     .await
     .unwrap();
   Json::from(customers)
@@ -50,7 +50,7 @@ async fn create(new_customer: Json<NewCustomer>) -> Status {
     new_customer.phone,
     new_customer.comment
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await;
 
   match result {

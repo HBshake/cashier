@@ -10,12 +10,14 @@ struct Shop {
   name: String,
   created_at: NaiveDateTime,
 }
-
 #[derive(Serialize, Deserialize)]
-struct NewShop {
-    name: String,
+struct ProductInShop {
+  id: i32,
+  name: String,
+  barcode: Option<String>,
+  price: f64,
+  created_at: NaiveDateTime,
 }
-
 #[derive(Serialize, Deserialize)]
 struct RawMaterialInShop {
   id: i32,
@@ -26,20 +28,18 @@ struct RawMaterialInShop {
 }
 
 #[derive(Serialize, Deserialize)]
+struct CreateShopInput {
+  name: String,
+}
+
+
+#[derive(Serialize, Deserialize)]
 struct NewRawMaterialInShop {
   raw_material_id: i32,
   shop_id: i32,
   stock: f64,
 }
 
-#[derive(Serialize, Deserialize)]
-struct ProductInShop {
-  id: i32,
-  name: String,
-  barcode: Option<String>,
-  price: f64,
-  created_at: NaiveDateTime,
-}
 
 #[derive(Serialize, Deserialize)]
 struct NewProductInShop {
@@ -52,25 +52,25 @@ struct NewProductInShop {
 async fn list() -> Json<Vec<Shop>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let shops = sqlx::query_as!(Shop, r#"SELECT * FROM shop"#)
-    .fetch_all(connection.as_mut())
+    .fetch_all(&mut *connection)
     .await
     .unwrap();
   Json::from(shops)
 }
 
-#[post("/", format = "json", data = "<new_shop>")]
-async fn create(new_shop: Json<NewShop>) -> Status {
+#[post("/", format = "json", data = "<input>")]
+async fn create(input: Json<CreateShopInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let result = sqlx::query!(r#"INSERT INTO shop (name) VALUES ($1)"#, new_shop.name)
-  .execute(connection.as_mut())
-  .await;
+  let result =
+    sqlx::query!(r#"INSERT INTO shop (name) VALUES ($1)"#, input.name)
+      .execute(&mut *connection)
+      .await;
 
   match result {
     Ok(_) => Status::Created,
     Err(_) => Status::BadRequest,
   }
 }
-
 
 #[get("/raw-materials/<id>")]
 async fn list_raw_materials_in_shop(id: i32) -> Json<Vec<RawMaterialInShop>> {
@@ -82,16 +82,23 @@ async fn list_raw_materials_in_shop(id: i32) -> Json<Vec<RawMaterialInShop>> {
     WHERE shop_id = $1"#,
     id
   )
-  .fetch_all(connection.as_mut())
+  .fetch_all(&mut *connection)
   .await
   .unwrap();
   Json::from(raw_materials)
 }
 
-#[post("/raw-materials/<shop_id>/raw-material", format = "json", data = "<new_raw_material_in_shop>")]
-async fn add_raw_material_in_shop(shop_id: i32, new_raw_material_in_shop: Json<NewRawMaterialInShop>) -> Status {
+#[post(
+  "/raw-materials/<shop_id>/raw-material",
+  format = "json",
+  data = "<new_raw_material_in_shop>"
+)]
+async fn add_raw_material_in_shop(
+  shop_id: i32,
+  new_raw_material_in_shop: Json<NewRawMaterialInShop>,
+) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  
+
   let result = sqlx::query!(
     r#"INSERT INTO raw_materials_in_shop
     (raw_material_id, shop_id, stock) 
@@ -100,7 +107,7 @@ async fn add_raw_material_in_shop(shop_id: i32, new_raw_material_in_shop: Json<N
     shop_id,
     new_raw_material_in_shop.stock
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await;
 
   match result {
@@ -119,16 +126,23 @@ async fn list_products_in_shop(id: i32) -> Json<Vec<ProductInShop>> {
     WHERE shop_id = $1"#,
     id
   )
-  .fetch_all(connection.as_mut())
+  .fetch_all(&mut *connection)
   .await
   .unwrap();
   Json::from(products)
 }
 
-#[post("/products/<shop_id>/product", format = "json", data = "<new_product_in_shop>")]
-async fn add_product_in_shop(shop_id: i32, new_product_in_shop: Json<NewProductInShop>) -> Status {
+#[post(
+  "/products/<shop_id>/product",
+  format = "json",
+  data = "<new_product_in_shop>"
+)]
+async fn add_product_in_shop(
+  shop_id: i32,
+  new_product_in_shop: Json<NewProductInShop>,
+) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  
+
   let result = sqlx::query!(
     r#"INSERT INTO products_in_shop
     (product_id, shop_id, stock) 
@@ -137,7 +151,7 @@ async fn add_product_in_shop(shop_id: i32, new_product_in_shop: Json<NewProductI
     shop_id,
     new_product_in_shop.stock
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await;
 
   match result {
@@ -147,5 +161,12 @@ async fn add_product_in_shop(shop_id: i32, new_product_in_shop: Json<NewProductI
 }
 
 pub(super) fn shop_routes() -> Vec<Route> {
-  routes![list, create, list_raw_materials_in_shop, add_raw_material_in_shop, list_products_in_shop, add_product_in_shop]
+  routes![
+    list,
+    create,
+    list_raw_materials_in_shop,
+    add_raw_material_in_shop,
+    list_products_in_shop,
+    add_product_in_shop
+  ]
 }

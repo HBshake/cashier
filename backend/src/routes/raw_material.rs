@@ -24,7 +24,7 @@ struct NewRawMaterial {
 async fn list() -> Json<Vec<RawMaterial>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let raw_materials = sqlx::query_as!(RawMaterial, r#"SELECT * FROM raw_material"#)
-    .fetch_all(connection.as_mut())
+    .fetch_all(&mut *connection)
     .await
     .unwrap();
   Json::from(raw_materials)
@@ -41,7 +41,7 @@ async fn create(new_raw_material: Json<NewRawMaterial>) -> Status {
     new_raw_material.unit_price,
     new_raw_material.unit_name
   )
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await;
 
   match result {

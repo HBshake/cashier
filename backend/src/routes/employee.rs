@@ -20,7 +20,7 @@ struct NewEmployee {
 async fn list() -> Json<Vec<Employee>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let employees = sqlx::query_as!(Employee, r#"SELECT * FROM employee"#)
-    .fetch_all(connection.as_mut())
+    .fetch_all(&mut *connection)
     .await
     .unwrap();
   Json::from(employees)
@@ -30,7 +30,7 @@ async fn list() -> Json<Vec<Employee>> {
 async fn create(new_employee: Json<NewEmployee>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let result = sqlx::query!(r#"INSERT INTO employee (name) VALUES ($1)"#, new_employee.name)
-  .execute(connection.as_mut())
+  .execute(&mut *connection)
   .await;
 
   match result {
