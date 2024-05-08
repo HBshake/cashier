@@ -18,7 +18,7 @@ import SessionPage from "./routes/dashboard/Session";
 import ProductPage from "./routes/dashboard/Product";
 import { printerList } from "./utils/hardware";
 import { configGet, configUnset } from "./utils/config";
-import LocauxPage from "./routes/dashboard/Locaux";
+import ShopPage from "./routes/dashboard/Shop";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -35,7 +35,7 @@ const router = createBrowserRouter(
         <Route path='raw-material' element={<RawMaterialPage />} />
         <Route path='Session' element={<SessionPage />} />
         <Route path='Product' element={<ProductPage />} />
-        <Route path ='Locaux' element={<LocauxPage/>}/>
+        <Route path ='shop' element={<ShopPage/>}/>
       </Route>
     </Route>,
   ]),

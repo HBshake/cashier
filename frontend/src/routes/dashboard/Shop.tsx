@@ -26,33 +26,18 @@ const columns: GridColDef<(typeof rows)[number]>[] = [
     sortable: false,
     width: 200,
   },
-  {
-    field: "who",
-    headerName: "Par",
-    type: "string",
-    sortable: false,
-    width: 200,
-  },
-  {
-    field: "modified",
-    headerName: "Mis à jour le",
-    type: "date",
-    sortable: false,
-    width: 200,
-  },
 ];
 
 const rows = [
   {
     id: 1,
-    name: "Brnosi",
+    name: "Bernoussi",
     creation_date: "",
     stock: "button",
-    who: "yomama",
   },
 ];
 
-export default function LocauxPage() {
+export default function ShopPage() {
   return (
     <>
       <Typography variant='h4'>Locaux</Typography>
