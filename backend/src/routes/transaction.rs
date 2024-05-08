@@ -1,4 +1,8 @@
-use crate::{data::transaction::{ProductInTransaction, Transaction, TransactionDetail}, guards::AuthGuard, CONNECION};
+use crate::{
+  data::transaction::{ProductInTransaction, Transaction, TransactionDetail},
+  guards::AuthGuard,
+  CONNECION,
+};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 use sqlx::Connection;
@@ -39,14 +43,17 @@ async fn detail(id: i32, _auth: AuthGuard) -> Json<TransactionDetail> {
   .fetch_one(&mut *connection)
   .await
   .unwrap();
-  
+
   let products = sqlx::query_as!(
     ProductInTransaction,
     r#"SELECT pit.product_id AS id, pit.unit_price, pit.count, pit.total_price
       FROM product_in_transaction pit
       WHERE pit.transaction_id = $1"#,
     id
-  ).fetch_all(&mut *connection).await.unwrap();
+  )
+  .fetch_all(&mut *connection)
+  .await
+  .unwrap();
 
   let transaction_detail = TransactionDetail {
     id: transaction.id,
@@ -62,9 +69,12 @@ async fn detail(id: i32, _auth: AuthGuard) -> Json<TransactionDetail> {
 }
 
 #[post("/", format = "json", data = "<input>")]
-async fn create(input: Json<CreateTransactionInput>, _auth: AuthGuard) -> Status {
+async fn create(
+  input: Json<CreateTransactionInput>,
+  _auth: AuthGuard,
+) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let mut tx = &mut *connection.begin().await.unwrap();
+  let mut tx = (&mut *connection).begin().await.unwrap();
   let transaction = sqlx::query!(
     r#"INSERT INTO transaction 
     (ttype, tax_percent, total_price, paid) 
