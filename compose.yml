@@ -25,7 +25,7 @@ services:
       - POSTGRES_DB=cashierdb
     volumes:
       - database:/var/lib/postgresql/data:rw
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./database/:/docker-entrypoint-initdb.d/:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d cashierdb -U postgres"]
       interval: 5s

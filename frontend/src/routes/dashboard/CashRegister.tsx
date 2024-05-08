@@ -14,9 +14,7 @@ export default function CashRegister() {
     },
     []
   );
-
-  console.log("tigre tonilas");
-
+  
   const addNewTab = useCallback(() => {
     setTabCounter(tabCounter + 1);
     setTabs([...tabs, `#${tabCounter + 1}`]);
