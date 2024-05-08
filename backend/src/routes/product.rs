@@ -1,36 +1,18 @@
-use crate::guards::AuthGuard;
+use crate::data::product::{ProductDetail, RawMaterialInProduct};
 use crate::CONNECION;
-use chrono::NaiveDateTime;
+use crate::{data::product::Product, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-struct Product {
-  id: i32,
-  name: String,
-  barcode: Option<String>,
-  price: f64,
-  created_at: NaiveDateTime,
-}
-
-#[derive(Serialize, Deserialize)]
-struct NewProduct {
+struct CreateProductInput {
   name: String,
   barcode: Option<String>,
   price: f64,
 }
 
 #[derive(Serialize, Deserialize)]
-struct RawMaterialInProduct {
-  id: i32,
-  name: String,
-  unit_price: f64,
-  unit_name: Option<String>,
-  created_at: NaiveDateTime,
-}
-
-#[derive(Serialize, Deserialize)]
-struct NewRawMaterialInProduct {
+struct AddRawMaterialInput {
   raw_material_id: i32,
   product_id: i32,
   quantity_per_unit: f64,
@@ -46,16 +28,16 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
   Json::from(products)
 }
 
-#[post("/", format = "json", data = "<new_product>")]
-async fn create(new_product: Json<NewProduct>) -> Status {
+#[post("/", format = "json", data = "<input>")]
+async fn create(input: Json<CreateProductInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
   sqlx::query!(
     r#"INSERT INTO product 
     (name, barcode, price) 
     VALUES ($1, $2, $3)"#,
-    new_product.name,
-    new_product.barcode,
-    new_product.price
+    input.name,
+    input.barcode,
+    input.price
   )
   .execute(&mut *connection)
   .await
@@ -63,30 +45,45 @@ async fn create(new_product: Json<NewProduct>) -> Status {
   Status::Created
 }
 
-#[get("/raw-material/<id>")]
-async fn list_raw_materials(id: i32) -> Json<Vec<RawMaterialInProduct>> {
+#[get("/<product_id>")]
+async fn detail(product_id: i32) -> Json<ProductDetail> {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let raw_materials: Vec<RawMaterialInProduct> = sqlx::query_as!(
+  let product = sqlx::query_as!(
+    Product,
+    r#"SELECT * FROM product WHERE id = $1"#,
+    product_id
+  )
+  .fetch_one(&mut *connection)
+  .await
+  .unwrap();
+
+  let raw_materials = sqlx::query_as!(
     RawMaterialInProduct,
-    r#"SELECT id, name, unit_price, unit_name, created_at
-    FROM raw_material_in_product JOIN raw_material ON id = raw_material_id 
+    r#"SELECT raw_material_id, name, quantity_per_unit
+    FROM raw_material_in_product JOIN raw_material ON raw_material_id = id
     WHERE product_id = $1"#,
-    id
+    product_id
   )
   .fetch_all(&mut *connection)
   .await
   .unwrap();
-  Json::from(raw_materials)
+
+  let detail = ProductDetail {
+    id: product.id,
+    name: product.name,
+    barcode: product.barcode,
+    price: product.price,
+    created_at: product.created_at,
+    raw_materials,
+  };
+
+  Json::from(detail)
 }
 
-#[post(
-  "/raw-material/<product_id>/raw-materials",
-  format = "json",
-  data = "<new_raw_material_in_product>"
-)]
-async fn add_raw_material_in_product(
+#[patch("/<product_id>", format = "json", data = "<input>")]
+async fn add_raw_material(
   product_id: i32,
-  new_raw_material_in_product: Json<NewRawMaterialInProduct>,
+  input: Json<AddRawMaterialInput>,
 ) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
 
@@ -94,9 +91,9 @@ async fn add_raw_material_in_product(
     r#"INSERT INTO raw_material_in_product 
     (raw_material_id, product_id, quantity_per_unit) 
     VALUES ($1, $2, $3)"#,
-    new_raw_material_in_product.raw_material_id,
+    input.raw_material_id,
     product_id,
-    new_raw_material_in_product.quantity_per_unit
+    input.quantity_per_unit
   )
   .execute(&mut *connection)
   .await
@@ -106,10 +103,5 @@ async fn add_raw_material_in_product(
 }
 
 pub(super) fn product_routes() -> Vec<Route> {
-  routes![
-    list,
-    create,
-    list_raw_materials,
-    add_raw_material_in_product
-  ]
+  routes![list, create, detail, add_raw_material]
 }
