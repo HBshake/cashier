@@ -1,10 +1,6 @@
 use std::{env, sync::OnceLock};
 
-use rocket::{
-  request::{self, FromRequest, Outcome},
-  tokio::sync::{Mutex, MutexGuard},
-  Request,
-};
+use rocket::tokio::sync::{Mutex, MutexGuard};
 use sqlx::{Connection, PgConnection};
 
 static CONNECTION: OnceLock<Mutex<PgConnection>> = OnceLock::new();

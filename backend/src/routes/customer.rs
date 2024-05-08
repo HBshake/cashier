@@ -1,4 +1,4 @@
-use crate::{data::customer::Customer, guards::AuthGuard};
+use crate::{data::customer::Customer, db, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
