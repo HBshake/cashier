@@ -1,8 +1,8 @@
+use crate::guards::AuthGuard;
+use crate::CONNECION;
 use chrono::NaiveDateTime;
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
-use crate::CONNECION;
-use crate::guards::AuthGuard;
 
 #[derive(Serialize, Deserialize)]
 struct Product {
@@ -49,7 +49,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
 #[post("/", format = "json", data = "<new_product>")]
 async fn create(new_product: Json<NewProduct>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let result = sqlx::query!(
+  sqlx::query!(
     r#"INSERT INTO product 
     (name, barcode, price) 
     VALUES ($1, $2, $3)"#,
@@ -58,12 +58,9 @@ async fn create(new_product: Json<NewProduct>) -> Status {
     new_product.price
   )
   .execute(connection.as_mut())
-  .await;
-
-  match result {
-    Ok(_) => Status::Created,
-    Err(_) => Status::BadRequest,
-  }
+  .await
+  .unwrap();
+  Status::Created
 }
 
 #[get("/raw-material/<id>")]
@@ -82,11 +79,18 @@ async fn list_raw_materials(id: i32) -> Json<Vec<RawMaterialInProduct>> {
   Json::from(raw_materials)
 }
 
-#[post("/raw-material/<product_id>/raw-materials", format = "json", data = "<new_raw_material_in_product>")]
-async fn add_raw_material_in_product(product_id: i32, new_raw_material_in_product: Json<NewRawMaterialInProduct>) -> Status {
+#[post(
+  "/raw-material/<product_id>/raw-materials",
+  format = "json",
+  data = "<new_raw_material_in_product>"
+)]
+async fn add_raw_material_in_product(
+  product_id: i32,
+  new_raw_material_in_product: Json<NewRawMaterialInProduct>,
+) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  
-  let result = sqlx::query!(
+
+  sqlx::query!(
     r#"INSERT INTO raw_materials_in_product 
     (raw_material_id, product_id, quantity_per_unit) 
     VALUES ($1, $2, $3)"#,
@@ -95,14 +99,17 @@ async fn add_raw_material_in_product(product_id: i32, new_raw_material_in_produc
     new_raw_material_in_product.quantity_per_unit
   )
   .execute(connection.as_mut())
-  .await;
+  .await
+  .unwrap();
 
-  match result {
-    Ok(_) => Status::Created,
-    Err(_) => Status::BadRequest,
-  }
+  Status::Created
 }
 
 pub(super) fn product_routes() -> Vec<Route> {
-  routes![list, create, list_raw_materials, add_raw_material_in_product]
+  routes![
+    list,
+    create,
+    list_raw_materials,
+    add_raw_material_in_product
+  ]
 }

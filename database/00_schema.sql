@@ -8,16 +8,6 @@ CREATE TABLE customer (
     comment TEXT,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE TABLE customer (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    ice TEXT,
-    rc TEXT,
-    delivery_address TEXT,
-    phone TEXT,
-    comment TEXT,
-    created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
 CREATE TABLE raw_material (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -60,16 +50,14 @@ CREATE TABLE products_in_shop (
     stock INTEGER NOT NULL,
     PRIMARY KEY (shop_id, product_id)
 );
-CREATE TYPE transaction_type AS ENUM ('delivery', 'in_store');
---should it be InStore or lower case... 
+-- Transaction
 CREATE TABLE transaction (
     id SERIAL PRIMARY KEY,
-    trans_type transaction_type NOT NULL,
+    ttype TEXT NOT NULL,
     tax_percent DOUBLE PRECISION NOT NULL,
     total_price DOUBLE PRECISION NOT NULL,
     paid DOUBLE PRECISION,
-    created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    created_by TEXT NOT NULL
+    created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 CREATE TABLE invoice (
     id SERIAL PRIMARY KEY,
@@ -84,9 +72,10 @@ CREATE TABLE product_in_transaction (
     name TEXT NOT NULL,
     unit_price DOUBLE PRECISION NOT NULL,
     count INTEGER NOT NULL,
-    total_price DOUBLE PRECISION,
+    total_price DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (product_id, transaction_id)
 );
+-- Auth
 CREATE TABLE account (
     username TEXT PRIMARY KEY,
     display_name TEXT NOT NULL,
