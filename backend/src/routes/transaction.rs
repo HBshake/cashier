@@ -20,7 +20,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Transaction>> {
     r#"SELECT id, ttype, tax_percent, total_price, paid, created_at
       FROM transaction"#
   )
-  .fetch_all(connection.as_mut())
+  .fetch_all(&mut *connection)
   .await
   .unwrap();
   Json(transactions)
@@ -50,7 +50,7 @@ async fn detail(id: i32, _auth: AuthGuard) -> Json<TransactionDetail> {
 
   let transaction_detail = TransactionDetail {
     id: transaction.id,
-    ttype: transaction.ttype,
+    ttype: transaction.ttype.into(),
     tax_percent: transaction.tax_percent,
     total_price: transaction.total_price,
     paid: transaction.paid,

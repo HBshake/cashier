@@ -7,10 +7,29 @@ pub enum TransactionType {
   InStore,
 }
 
+impl Into<TransactionType> for String {
+  fn into(self) -> TransactionType {
+    match self.as_str() {
+      "Delivery" => TransactionType::Delivery,
+      "InStore" => TransactionType::InStore,
+      _ => TransactionType::InStore,
+    }
+  }
+}
+
+impl Into<String> for TransactionType {
+  fn into(self) -> String {
+    match self {
+      TransactionType::Delivery => "Delivery".to_string(),
+      TransactionType::InStore => "InStore".to_string(),
+    }
+  }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Transaction {
   pub id: i32,
-  pub ttype: String,
+  pub ttype: TransactionType,
   pub tax_percent: f64,
   pub total_price: f64,
   pub paid: Option<f64>,
