@@ -69,7 +69,7 @@ async fn list_raw_materials(id: i32) -> Json<Vec<RawMaterialInProduct>> {
   let raw_materials: Vec<RawMaterialInProduct> = sqlx::query_as!(
     RawMaterialInProduct,
     r#"SELECT id, name, unit_price, unit_name, created_at
-    FROM raw_materials_in_product JOIN raw_material ON id = raw_material_id 
+    FROM raw_material_in_product JOIN raw_material ON id = raw_material_id 
     WHERE product_id = $1"#,
     id
   )
@@ -91,7 +91,7 @@ async fn add_raw_material_in_product(
   let mut connection = CONNECION.get().unwrap().lock().await;
 
   sqlx::query!(
-    r#"INSERT INTO raw_materials_in_product 
+    r#"INSERT INTO raw_material_in_product 
     (raw_material_id, product_id, quantity_per_unit) 
     VALUES ($1, $2, $3)"#,
     new_raw_material_in_product.raw_material_id,

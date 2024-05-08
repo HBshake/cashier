@@ -22,7 +22,7 @@ CREATE TABLE product (
     price DOUBLE PRECISION NOT NULL,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE TABLE raw_materials_in_product (
+CREATE TABLE raw_material_in_product (
     raw_material_id SERIAL REFERENCES raw_material (id),
     product_id SERIAL REFERENCES product (id),
     quantity_per_unit DOUBLE PRECISION NOT NULL,
@@ -38,13 +38,13 @@ CREATE TABLE employee (
     name TEXT NOT NULL,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE TABLE raw_materials_in_shop (
+CREATE TABLE raw_material_in_shop (
     raw_material_id SERIAL REFERENCES raw_material (id),
     shop_id SERIAL REFERENCES shop (id),
     stock DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (raw_material_id, shop_id)
 );
-CREATE TABLE products_in_shop (
+CREATE TABLE product_in_shop (
     product_id SERIAL REFERENCES product (id),
     shop_id SERIAL REFERENCES shop (id),
     stock INTEGER NOT NULL,
