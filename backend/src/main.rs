@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate rocket;
 
+pub mod data;
+pub mod guards;
 mod routes;
 
 use std::{env, sync::OnceLock};
@@ -15,7 +17,9 @@ static CONNECION: OnceLock<Mutex<PgConnection>> = OnceLock::new();
 async fn rocket() -> _ {
   let connection_url = env::var("DATABASE_URL")
     .expect("Could not find environment variable `DATABASE_URL`.");
-  let connection = PgConnection::connect(&connection_url).await.expect("Could not connect to database.");
+  let connection = PgConnection::connect(&connection_url)
+    .await
+    .expect("Could not connect to database.");
 
   CONNECION.get_or_init(|| Mutex::new(connection));
   rocket::build().initialize_routes()

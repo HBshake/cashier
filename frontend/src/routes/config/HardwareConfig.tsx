@@ -48,7 +48,6 @@ function SettingRow({
 }) {
   const dict = useDict();
   const [value, setValue] = useNative<string | null>("config_get", { name: configName });
-  console.log(value);
   const updateValue = useCallback(async (newValue: string) => {
     await configSet(configName, newValue);
     setValue(newValue);

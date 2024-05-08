@@ -1,5 +1,6 @@
 import {
   Avatar,
+  CircularProgress,
   Link,
   List,
   ListItem,
@@ -10,24 +11,15 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import { useDict } from "../../hooks/locale";
+import { useRequest } from "../../hooks/req";
 
 export default function ProfileSelector() {
   const dict = useDict();
+  const [cashiers] = useRequest<StrippedAccount[]>("/auth/accounts");
 
-  const cashiers = [
-    {
-      username: "ikram",
-      displayName: "Ikram",
-    },
-    {
-      username: "hiba",
-      displayName: "Hiba",
-    },
-    {
-      username: "youssef",
-      displayName: "Youssef",
-    }
-  ];
+  if(!cashiers) {
+    return <CircularProgress />
+  }
 
   if (!cashiers.length) {
     return <Typography paragraph>{dict.login.error.nosetup}</Typography>;
@@ -37,11 +29,11 @@ export default function ProfileSelector() {
     <>
       <Typography variant="h4">{dict.login.title}</Typography>
       <List>
-        {cashiers.map(({ username, displayName }) => (
+        {cashiers.map(({ username, display_name }) => (
           <ListItem key={username} disablePadding>
             <ListItemButton
               component={Link}
-              href={`/login/${username}/${displayName}`}
+              href={`/login/${username}/${display_name}`}
             >
               <ListItemAvatar>
                 <Avatar>
@@ -49,7 +41,7 @@ export default function ProfileSelector() {
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
-                primary={displayName}
+                primary={display_name}
                 secondary={dict.login.loginAs.replaceAll(
                   "{username}",
                   username
