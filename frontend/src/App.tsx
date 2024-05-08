@@ -39,7 +39,7 @@ const router = createBrowserRouter(
         <Route path='raw-material' element={<RawMaterialPage />} />
         <Route path='session' element={<SessionPage />} />
         <Route path='product' element={<ProductPage />} />
-        <Route path ='stock' element={<StockPage/>}/>
+        <Route path ='stock' element={<ShopPage/>}/>
       </Route>
     </Route>,
   ]),

@@ -29,7 +29,7 @@ const rows = [
   },
 ];
 
-export default function StockPage() {
+export default function ShopPage() {
   return (
     <>
       <Typography variant='h4'>Stock</Typography>
