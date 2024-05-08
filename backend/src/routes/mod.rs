@@ -34,7 +34,7 @@ impl InitializeRoutes for Rocket<Build> {
       .mount("/customer", customer_routes())
       .mount("/product", product_routes())
       .mount("/raw-material", raw_matrial_routes())
-      .mount("/invoice", shop_routes())
+      .mount("/shop", shop_routes())
       .mount("/employee", employee_routes())
       .mount("/transaction", transaction_routes())
   }
