@@ -4,33 +4,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::CONNECION;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, sqlx::Type, Serialize, Deserialize)]
+#[sqlx(type_name = "transaction_type", rename_all = "lowercase")]
 pub enum TransactionType {
     Delivery,
     InStore,
-    Unknown,
 }
-
-impl From<i32> for TransactionType {
-  fn from(item: i32) -> Self {
-      match item {
-          1 => TransactionType::Delivery,
-          2 => TransactionType::InStore,
-          _ => TransactionType::Unknown,
-      }
-  }
-}
-
-impl Into<i32> for TransactionType {
-  fn into(self) -> i32 {
-      match self {
-          TransactionType::Delivery => 1,
-          TransactionType::InStore => 2,
-          TransactionType::Unknown => 0,
-      }
-  }
-}
-
 
 #[derive(Serialize, Deserialize)]
 struct Transaction {
@@ -55,7 +34,7 @@ struct NewTransaction {
 #[get("/")]
 async fn list() -> Json<Vec<Transaction>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let transactions = sqlx::query_as!(Transaction, r#"SELECT id, trans_type, tax_percent, total_price, paid, created_at, created_by FROM transaction"#)
+  let transactions = sqlx::query_as!(Transaction, r#"SELECT id, trans_type::transaction_type AS "trans_type!: TransactionType", tax_percent, total_price, paid, created_at, created_by FROM transaction"#)
     .fetch_all(connection.as_mut())
     .await
     .unwrap();
@@ -65,30 +44,18 @@ async fn list() -> Json<Vec<Transaction>> {
 #[post("/", format = "json", data = "<new_transaction>")]
 async fn create(new_transaction: Json<NewTransaction>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let result = sqlx::query_as!(NewTransaction,
+  let result = sqlx::query!(
     r#"INSERT INTO transaction 
     (trans_type, tax_percent, total_price, paid, created_by) 
     VALUES ($1, $2, $3, $4, $5)"#,
-    new_transaction.trans_type.into(),
+    &new_transaction.trans_type as &TransactionType,
     new_transaction.tax_percent, 
     new_transaction.total_price,
-    new_transaction.paid,
+    new_transaction.paid.as_ref(),
     new_transaction.created_by
   )
   .execute(connection.as_mut())
-  .await
-  .unwrap()
-  .into_iter()
-  .map(|row| Transaction {
-    id: row.get(0),
-    trans_type: TransactionType::from(row.get::<i32, _>(1)),  // Convert from i32
-    tax_percent: row.get(2),
-    total_price: row.get(3),
-    paid: row.get(4),
-    created_at: row.get(5),
-    created_by: row.get(6),
-})
-.collect();
+  .await;
 
   match result {
     Ok(_) => Status::Created,

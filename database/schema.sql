@@ -58,14 +58,14 @@ CREATE TABLE products_in_shop (
     PRIMARY KEY (shop_id, product_id)
 );
 
+CREATE TYPE transaction_type AS ENUM ('delivery', 'in_store');  --should it be InStore or lower case... 
+
 CREATE TABLE transaction (
     id SERIAL PRIMARY KEY,
-    trans_type INTEGER NOT NULL,
+    trans_type transaction_type NOT NULL,
     tax_percent DOUBLE PRECISION NOT NULL, 
     total_price DOUBLE PRECISION NOT NULL, 
     paid DOUBLE PRECISION, 
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     created_by TEXT NOT NULL    
 );
-
-// should remove that ENUM
