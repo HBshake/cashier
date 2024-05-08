@@ -1,5 +1,5 @@
 use crate::data::product::{ProductDetail, RawMaterialInProduct};
-use crate::CONNECION;
+use crate::db;
 use crate::{data::product::Product, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
@@ -20,7 +20,7 @@ struct AddRawMaterialInput {
 
 #[get("/")]
 async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let products = sqlx::query_as!(Product, r#"SELECT * FROM product"#)
     .fetch_all(&mut *connection)
     .await
@@ -30,7 +30,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
 
 #[post("/", format = "json", data = "<input>")]
 async fn create(input: Json<CreateProductInput>) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO product 
     (name, barcode, price) 
@@ -47,7 +47,7 @@ async fn create(input: Json<CreateProductInput>) -> Status {
 
 #[get("/<product_id>")]
 async fn detail(product_id: i32) -> Json<ProductDetail> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let product = sqlx::query_as!(
     Product,
     r#"SELECT * FROM product WHERE id = $1"#,
@@ -85,8 +85,7 @@ async fn add_raw_material(
   product_id: i32,
   input: Json<AddRawMaterialInput>,
 ) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
-
+  let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO raw_material_in_product 
     (raw_material_id, product_id, quantity_per_unit) 

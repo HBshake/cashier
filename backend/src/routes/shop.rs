@@ -2,9 +2,7 @@ use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-  data::shop::{ProductInShop, RawMaterialInShop, Shop},
-  guards::AuthGuard,
-  CONNECION,
+  data::shop::{ProductInShop, RawMaterialInShop, Shop}, db, guards::AuthGuard
 };
 
 #[derive(Serialize, Deserialize)]
@@ -26,8 +24,8 @@ struct AddRawMaterialStockInput {
 }
 
 #[get("/")]
-async fn list(_auth: AuthGuard) -> Json<Vec<Shop>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+async fn list<'db>(_auth: AuthGuard) -> Json<Vec<Shop>> {
+  let mut connection = db::get_connection().await;
   let shops = sqlx::query_as!(Shop, r#"SELECT * FROM shop"#)
     .fetch_all(&mut *connection)
     .await
@@ -37,7 +35,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Shop>> {
 
 #[post("/", format = "json", data = "<input>")]
 async fn create(_auth: AuthGuard, input: Json<CreateShopInput>) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   sqlx::query!(r#"INSERT INTO shop (name) VALUES ($1)"#, input.name)
     .execute(&mut *connection)
     .await
@@ -51,7 +49,7 @@ async fn product_stock(
   _auth: AuthGuard,
   shop_id: i32,
 ) -> Json<Vec<ProductInShop>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let products: Vec<ProductInShop> = sqlx::query_as!(
     ProductInShop,
     r#"SELECT id, name, barcode, price, created_at
@@ -69,7 +67,7 @@ async fn rawmat_stock(
   _auth: AuthGuard,
   shop_id: i32,
 ) -> Json<Vec<RawMaterialInShop>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let raw_materials: Vec<RawMaterialInShop> = sqlx::query_as!(
     RawMaterialInShop,
     r#"SELECT raw_material.name, stock
@@ -89,8 +87,7 @@ async fn add_product_stock(
   shop_id: i32,
   input: Json<AddProductStockInput>,
 ) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
-
+  let mut connection = db::get_connection().await;
   let result = sqlx::query!(
     r#"UPDATE product_in_shop
     SET stock = stock + $1
@@ -110,13 +107,12 @@ async fn add_product_stock(
   }
 }
 #[post("/<shop_id>/raw-material", format = "json", data = "<input>")]
-async fn add_rawmat_stock(
+async fn add_rawmat_stock<'db>(
   _auth: AuthGuard,
   shop_id: i32,
   input: Json<AddRawMaterialStockInput>,
 ) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
-
+  let mut connection = db::get_connection().await;
   let r = sqlx::query!(
     r#"UPDATE raw_material_in_shop
     SET stock = stock + $1

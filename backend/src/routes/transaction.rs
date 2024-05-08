@@ -1,7 +1,7 @@
 use crate::{
   data::transaction::{ProductInTransaction, Transaction, TransactionDetail},
+  db,
   guards::AuthGuard,
-  CONNECION,
 };
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,7 @@ struct CreateTransactionInput {
 
 #[get("/")]
 async fn list(_auth: AuthGuard) -> Json<Vec<Transaction>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let transactions = sqlx::query_as!(
     Transaction,
     r#"SELECT id, ttype, tax_percent, total_price, paid, created_at
@@ -32,7 +32,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Transaction>> {
 
 #[get("/<id>")]
 async fn detail(_auth: AuthGuard, id: i32) -> Json<TransactionDetail> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let transaction = sqlx::query_as!(
     Transaction,
     r#"SELECT id, ttype, tax_percent, total_price, paid, created_at
@@ -73,7 +73,7 @@ async fn create(
   _auth: AuthGuard,
   input: Json<CreateTransactionInput>,
 ) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let mut tx = (&mut *connection).begin().await.unwrap();
   let transaction = sqlx::query!(
     r#"INSERT INTO transaction 

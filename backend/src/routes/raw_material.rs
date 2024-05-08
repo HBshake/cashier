@@ -1,4 +1,4 @@
-use crate::{data::raw_material::RawMaterial, guards::AuthGuard, CONNECION};
+use crate::{data::raw_material::RawMaterial, db, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ struct CreateRawMaterialInput {
 
 #[get("/")]
 async fn list(_auth: AuthGuard) -> Json<Vec<RawMaterial>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let raw_materials =
     sqlx::query_as!(RawMaterial, r#"SELECT * FROM raw_material"#)
       .fetch_all(&mut *connection)
@@ -21,8 +21,11 @@ async fn list(_auth: AuthGuard) -> Json<Vec<RawMaterial>> {
 }
 
 #[post("/", format = "json", data = "<input>")]
-async fn create(_auth: AuthGuard, input: Json<CreateRawMaterialInput>) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+async fn create(
+  _auth: AuthGuard,
+  input: Json<CreateRawMaterialInput>,
+) -> Status {
+  let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO raw_material 
     (name, unit_price, unit_name) 

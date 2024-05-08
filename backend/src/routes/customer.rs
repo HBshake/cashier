@@ -1,4 +1,4 @@
-use crate::{data::customer::Customer, guards::AuthGuard, CONNECION};
+use crate::{data::customer::Customer, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +14,7 @@ struct CreateCustomerInput {
 
 #[get("/")]
 async fn list(_auth: AuthGuard) -> Json<Vec<Customer>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let customers = sqlx::query_as!(Customer, r#"SELECT * FROM customer"#)
     .fetch_all(&mut *connection)
     .await
@@ -24,7 +24,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Customer>> {
 
 #[post("/", format = "json", data = "<input>")]
 async fn create(_auth: AuthGuard, input: Json<CreateCustomerInput>) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO customer 
     (name, ice, rc, delivery_address, phone, comment) 

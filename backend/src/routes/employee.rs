@@ -1,4 +1,4 @@
-use crate::{data::employee::Employee, guards::AuthGuard, CONNECION};
+use crate::{data::employee::Employee, db, guards::AuthGuard};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +9,7 @@ struct CreateEmployeeInput {
 
 #[get("/")]
 async fn list(_auth: AuthGuard) -> Json<Vec<Employee>> {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   let employees = sqlx::query_as!(Employee, r#"SELECT * FROM employee"#)
     .fetch_all(&mut *connection)
     .await
@@ -19,7 +19,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Employee>> {
 
 #[post("/", format = "json", data = "<input>")]
 async fn create(_auth: AuthGuard, input: Json<CreateEmployeeInput>) -> Status {
-  let mut connection = CONNECION.get().unwrap().lock().await;
+  let mut connection = db::get_connection().await;
   sqlx::query!(r#"INSERT INTO employee (name) VALUES ($1)"#, input.name)
     .execute(&mut *connection)
     .await

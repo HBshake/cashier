@@ -1,10 +1,11 @@
-use crate::CONNECION;
 use rocket::{
   http::Status,
   outcome::Outcome,
   request::{self, FromRequest},
   Request,
 };
+
+use crate::db;
 
 pub struct AccessGuard {
   token: String,
@@ -20,7 +21,7 @@ impl<'r> FromRequest<'r> for AccessGuard {
     if access_token.is_none() {
       return Outcome::Error((Status::Unauthorized, ()));
     }
-    let mut connection = CONNECION.get().unwrap().lock().await;
+    let mut connection = db::get_connection().await;
     let access_token = access_token.unwrap();
     let token_result =
       sqlx::query!("SELECT * FROM access_token WHERE name = $1", access_token)
@@ -61,11 +62,10 @@ impl<'r> FromRequest<'r> for AuthGuard {
     if session_id.is_none() {
       return Outcome::Error((Status::Unauthorized, ()));
     }
-    let mut connection = CONNECION.get().unwrap().lock().await;
+    let mut connection = db::get_connection().await;
     let session_id = session_id.unwrap();
     let account = sqlx::query!(
-      r#"SELECT username, display_name,
-                perms, logout_time
+      r#"SELECT username, display_name, perms, logout_time
         FROM (session JOIN account ON account_username = account.username)
         WHERE session.id = $1"#,
       session_id
