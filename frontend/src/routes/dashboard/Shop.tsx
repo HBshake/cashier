@@ -37,7 +37,7 @@ const rows = [
   },
 ];
 
-export default function ShopPage() {
+export default function StockPage() {
   return (
     <>
       <Typography variant='h4'>Locaux</Typography>
