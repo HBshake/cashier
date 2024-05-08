@@ -77,3 +77,13 @@ CREATE TABLE invoice (
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     transaction_id INT NOT NULL REFERENCES transaction (id)
 );
+
+CREATE TABLE product_in_transaction (
+    product_id SERIAL REFERENCES product (id),
+    transaction_id SERIAL REFERENCES transaction (id),
+    name TEXT NOT NULL,
+    unit_price DOUBLE PRECISION NOT NULL,
+    count INTEGER NOT NULL,
+    total_price DOUBLE PRECISION, 
+    PRIMARY KEY (product_id, transaction_id)
+);
