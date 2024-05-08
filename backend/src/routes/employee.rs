@@ -1,23 +1,14 @@
-use chrono::NaiveDateTime;
+use crate::{data::employee::Employee, guards::AuthGuard, CONNECION};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
-use crate::CONNECION;
-
 #[derive(Serialize, Deserialize)]
-struct Employee {
-  id: i32,
+struct CreateEmployeeInput {
   name: String,
-  created_at: NaiveDateTime,
-}
-
-#[derive(Serialize, Deserialize)]
-struct NewEmployee {
-    name: String,
 }
 
 #[get("/")]
-async fn list() -> Json<Vec<Employee>> {
+async fn list(_auth: AuthGuard) -> Json<Vec<Employee>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let employees = sqlx::query_as!(Employee, r#"SELECT * FROM employee"#)
     .fetch_all(&mut *connection)
@@ -26,17 +17,15 @@ async fn list() -> Json<Vec<Employee>> {
   Json::from(employees)
 }
 
-#[post("/", format = "json", data = "<new_employee>")]
-async fn create(new_employee: Json<NewEmployee>) -> Status {
+#[post("/", format = "json", data = "<input>")]
+async fn create(_auth: AuthGuard, input: Json<CreateEmployeeInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let result = sqlx::query!(r#"INSERT INTO employee (name) VALUES ($1)"#, new_employee.name)
-  .execute(&mut *connection)
-  .await;
+  sqlx::query!(r#"INSERT INTO employee (name) VALUES ($1)"#, input.name)
+    .execute(&mut *connection)
+    .await
+    .unwrap();
 
-  match result {
-    Ok(_) => Status::Created,
-    Err(_) => Status::BadRequest,
-  }
+  Status::Created
 }
 
 pub(super) fn employee_routes() -> Vec<Route> {

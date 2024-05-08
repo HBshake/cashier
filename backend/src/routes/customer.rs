@@ -1,23 +1,9 @@
-use chrono::NaiveDateTime;
+use crate::{data::customer::Customer, guards::AuthGuard, CONNECION};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
-use crate::{guards::AuthGuard, CONNECION};
-
 #[derive(Serialize, Deserialize)]
-struct Customer {
-  id: i32,
-  name: String,
-  ice: Option<String>,
-  rc: Option<String>,
-  delivery_address: Option<String>,
-  phone: Option<String>,
-  comment: Option<String>,
-  created_at: NaiveDateTime,
-}
-
-#[derive(Serialize, Deserialize)]
-struct NewCustomer {
+struct CreateCustomerInput {
   name: String,
   ice: Option<String>,
   rc: Option<String>,
@@ -36,27 +22,25 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Customer>> {
   Json::from(customers)
 }
 
-#[post("/", format = "json", data = "<new_customer>")]
-async fn create(new_customer: Json<NewCustomer>) -> Status {
+#[post("/", format = "json", data = "<input>")]
+async fn create(_auth: AuthGuard, input: Json<CreateCustomerInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
-  let result = sqlx::query!(
+  sqlx::query!(
     r#"INSERT INTO customer 
     (name, ice, rc, delivery_address, phone, comment) 
     VALUES ($1, $2, $3, $4, $5, $6)"#,
-    new_customer.name,
-    new_customer.ice,
-    new_customer.rc,
-    new_customer.delivery_address,
-    new_customer.phone,
-    new_customer.comment
+    input.name,
+    input.ice,
+    input.rc,
+    input.delivery_address,
+    input.phone,
+    input.comment
   )
   .execute(&mut *connection)
-  .await;
+  .await
+  .unwrap();
 
-  match result {
-    Ok(_) => Status::Created,
-    Err(_) => Status::BadRequest,
-  }
+  Status::Created
 }
 
 pub(super) fn customer_routes() -> Vec<Route> {
