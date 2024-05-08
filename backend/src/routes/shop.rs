@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
   data::shop::{ProductInShop, RawMaterialInShop, Shop},
+  guards::AuthGuard,
   CONNECION,
 };
 
@@ -10,7 +11,6 @@ use crate::{
 struct CreateShopInput {
   name: String,
 }
-
 
 #[derive(Serialize, Deserialize)]
 struct AddProductStockInput {
@@ -26,7 +26,7 @@ struct AddRawMaterialStockInput {
 }
 
 #[get("/")]
-async fn list() -> Json<Vec<Shop>> {
+async fn list(_auth: AuthGuard) -> Json<Vec<Shop>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let shops = sqlx::query_as!(Shop, r#"SELECT * FROM shop"#)
     .fetch_all(&mut *connection)
@@ -36,7 +36,7 @@ async fn list() -> Json<Vec<Shop>> {
 }
 
 #[post("/", format = "json", data = "<input>")]
-async fn create(input: Json<CreateShopInput>) -> Status {
+async fn create(_auth: AuthGuard, input: Json<CreateShopInput>) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
   sqlx::query!(r#"INSERT INTO shop (name) VALUES ($1)"#, input.name)
     .execute(&mut *connection)
@@ -47,7 +47,10 @@ async fn create(input: Json<CreateShopInput>) -> Status {
 }
 
 #[get("/<shop_id>/product")]
-async fn product_stock(shop_id: i32) -> Json<Vec<ProductInShop>> {
+async fn product_stock(
+  _auth: AuthGuard,
+  shop_id: i32,
+) -> Json<Vec<ProductInShop>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let products: Vec<ProductInShop> = sqlx::query_as!(
     ProductInShop,
@@ -62,7 +65,10 @@ async fn product_stock(shop_id: i32) -> Json<Vec<ProductInShop>> {
   Json::from(products)
 }
 #[get("/<shop_id>/raw-material")]
-async fn rawmat_stock(shop_id: i32) -> Json<Vec<RawMaterialInShop>> {
+async fn rawmat_stock(
+  _auth: AuthGuard,
+  shop_id: i32,
+) -> Json<Vec<RawMaterialInShop>> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let raw_materials: Vec<RawMaterialInShop> = sqlx::query_as!(
     RawMaterialInShop,
@@ -79,6 +85,7 @@ async fn rawmat_stock(shop_id: i32) -> Json<Vec<RawMaterialInShop>> {
 
 #[post("/<shop_id>/product", format = "json", data = "<input>")]
 async fn add_product_stock(
+  _auth: AuthGuard,
   shop_id: i32,
   input: Json<AddProductStockInput>,
 ) -> Status {
@@ -104,6 +111,7 @@ async fn add_product_stock(
 }
 #[post("/<shop_id>/raw-material", format = "json", data = "<input>")]
 async fn add_rawmat_stock(
+  _auth: AuthGuard,
   shop_id: i32,
   input: Json<AddRawMaterialStockInput>,
 ) -> Status {

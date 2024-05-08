@@ -31,7 +31,7 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Transaction>> {
 }
 
 #[get("/<id>")]
-async fn detail(id: i32, _auth: AuthGuard) -> Json<TransactionDetail> {
+async fn detail(_auth: AuthGuard, id: i32) -> Json<TransactionDetail> {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let transaction = sqlx::query_as!(
     Transaction,
@@ -70,8 +70,8 @@ async fn detail(id: i32, _auth: AuthGuard) -> Json<TransactionDetail> {
 
 #[post("/", format = "json", data = "<input>")]
 async fn create(
-  input: Json<CreateTransactionInput>,
   _auth: AuthGuard,
+  input: Json<CreateTransactionInput>,
 ) -> Status {
   let mut connection = CONNECION.get().unwrap().lock().await;
   let mut tx = (&mut *connection).begin().await.unwrap();
