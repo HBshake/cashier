@@ -37,9 +37,9 @@ const router = createBrowserRouter(
         <Route path='cashreg' element={<CashRegister />} />
         <Route path='customer' element={<CustomerPage />} />
         <Route path='raw-material' element={<RawMaterialPage />} />
-        <Route path='Session' element={<SessionPage />} />
-        <Route path='Product' element={<ProductPage />} />
-        <Route path ='shop' element={<ShopPage/>}/>
+        <Route path='session' element={<SessionPage />} />
+        <Route path='product' element={<ProductPage />} />
+        <Route path ='stock' element={<StockPage/>}/>
       </Route>
     </Route>,
   ]),
