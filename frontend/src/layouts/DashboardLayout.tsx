@@ -73,7 +73,7 @@ const nav: NavDestination[] = [
   {
     name: "locations",
     icon: Home,
-    route: "locations",
+    route: "shop",
   },
   {
     name: "stock",
