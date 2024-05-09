@@ -11,12 +11,11 @@ pub struct Shop {
 pub struct ProductInShop {
   pub id: i32,
   pub name: String,
-  pub barcode: Option<String>,
-  pub price: f64,
-  pub created_at: NaiveDateTime,
+  pub count: i32,
 }
 #[derive(Serialize, Deserialize)]
 pub struct RawMaterialInShop {
+  pub id: i32,
   pub name: String,
-  pub stock: f64,
+  pub count: f64,
 }

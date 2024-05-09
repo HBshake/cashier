@@ -47,7 +47,7 @@ export default function TransactionBoard() {
   const [totalPriceInclTax, setTotalPriceInclTax] = useState(0);
   const [paid, setPaid] = useState(0);
   const [returned, setReturned] = useState(0);
-  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [_, setCustomer] = useState<Customer | null>(null);
 
   const [reductionError, setReductionError] = useState(false);
   const [taxError, setTaxError] = useState(false);

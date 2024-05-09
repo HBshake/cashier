@@ -52,7 +52,7 @@ async fn product_stock(
   let mut connection = db::get_connection().await;
   let products: Vec<ProductInShop> = sqlx::query_as!(
     ProductInShop,
-    r#"SELECT id, name, barcode, price, created_at
+    r#"SELECT id AS id, name, stock AS count
     FROM product_in_shop JOIN product ON id = product_id 
     WHERE shop_id = $1"#,
     shop_id
@@ -70,7 +70,7 @@ async fn rawmat_stock(
   let mut connection = db::get_connection().await;
   let raw_materials: Vec<RawMaterialInShop> = sqlx::query_as!(
     RawMaterialInShop,
-    r#"SELECT raw_material.name, stock
+    r#"SELECT id, name, stock AS count
     FROM raw_material_in_shop JOIN raw_material ON id = raw_material_id 
     WHERE shop_id = $1"#,
     shop_id
