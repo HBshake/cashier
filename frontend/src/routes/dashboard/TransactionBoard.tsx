@@ -33,14 +33,6 @@ type ProductInTransaction = {
   total_price: number;
 };
 
-type CreateTransactionInput = {
-  ttype: "Delivery" | "InStore";
-  tax_percent: number;
-  total_price: number;
-  paid: number;
-  products: ProductInTransaction[];
-};
-
 export default function TransactionBoard() {
   const [products] = useRequest<Product[]>("/product");
   const [customers] = useRequest<Customer[]>("/customer");

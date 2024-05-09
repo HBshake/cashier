@@ -1,5 +1,5 @@
 use rocket::{http::Status, serde::json::Json, Route};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{data::auth::StrippedAccount, db, guards::AccessGuard};
@@ -13,6 +13,14 @@ struct AccessInput {
 struct LoginInput {
   username: String,
   password: String,
+}
+
+#[derive(Serialize)]
+struct LoginOutput {
+  session_id: String,
+  username: String,
+  display_name: String,
+  perms: Vec<String>,
 }
 
 #[post("/access", format = "json", data = "<access>")]
@@ -39,10 +47,10 @@ async fn access(access: Json<AccessInput>) -> Status {
 async fn login(
   cred: Json<LoginInput>,
   _access: AccessGuard,
-) -> Result<Json<String>, Status> {
+) -> Result<Json<LoginOutput>, Status> {
   let mut connection = db::get_connection().await;
   let account = sqlx::query!(
-    "SELECT pass_hash FROM account WHERE username = $1",
+    "SELECT display_name, perms, pass_hash FROM account WHERE username = $1",
     cred.username,
   )
   .fetch_optional(&mut *connection)
@@ -66,24 +74,25 @@ async fn login(
   .execute(&mut *connection)
   .await
   .unwrap();
-  Ok(Json(session_id))
+  Ok(Json(LoginOutput {
+    session_id,
+    username: cred.username.clone(),
+    display_name: account.display_name,
+    perms: account.perms,
+  }))
 }
 
 #[get("/accounts")]
 async fn list(_access: AccessGuard) -> Json<Vec<StrippedAccount>> {
   let mut connection = db::get_connection().await;
-  let accounts = sqlx::query!("SELECT username, display_name FROM account")
-    .fetch_all(&mut *connection)
-    .await
-    .unwrap();
-  let stripped_accounts: Vec<_> = accounts
-    .iter()
-    .map(|account| StrippedAccount {
-      username: account.username.clone(),
-      display_name: account.display_name.clone(),
-    })
-    .collect();
-  Json::from(stripped_accounts)
+  let accounts = sqlx::query_as!(
+    StrippedAccount,
+    "SELECT username, display_name FROM account"
+  )
+  .fetch_all(&mut *connection)
+  .await
+  .unwrap();
+  Json::from(accounts)
 }
 
 pub(super) fn auth_routes() -> Vec<Route> {
