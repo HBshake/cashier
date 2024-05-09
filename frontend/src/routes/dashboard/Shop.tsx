@@ -10,13 +10,7 @@ import { useRequest } from "../../hooks/req";
 import dayjs from "dayjs";
 import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-
-type Shop = {
-  id: number;
-  name: string;
-  stock: string;
-  creation_date: string;
-};
+import { Shop } from "../../models/shop";
 
 const columns: GridColDef<Shop>[] = [
   {
