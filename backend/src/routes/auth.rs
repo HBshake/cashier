@@ -109,6 +109,19 @@ async fn sessions(auth: AuthGuard) -> Json<Vec<Session>> {
   Json::from(sessions)
 }
 
+#[get("/logout")]
+async fn logout(auth: AuthGuard) -> Status {
+  let mut connection = db::get_connection().await;
+  sqlx::query!(
+    "UPDATE session SET logout_time = NOW() WHERE id = $1",
+    auth.session_id
+  )
+  .execute(&mut *connection)
+  .await
+  .unwrap();
+  Status::Ok
+}
+
 pub(super) fn auth_routes() -> Vec<Route> {
-  routes![access, login, list, sessions]
+  routes![access, login, logout, list, sessions]
 }

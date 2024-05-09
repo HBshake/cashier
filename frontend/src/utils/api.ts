@@ -91,6 +91,7 @@ export const cashierApi = {
     }
   },
   async logout() {
+    await this.get("/auth/logout");
     await configUnset("session");
   },
   async session(): Promise<Session | null> {
