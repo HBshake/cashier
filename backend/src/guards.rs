@@ -48,6 +48,7 @@ impl<'r> FromRequest<'r> for AccessGuard {
 
 #[derive(Clone)]
 pub struct AuthGuard {
+  pub session_id: String,
   pub username: String,
   pub display_name: String,
   pub perms: Vec<String>,
@@ -93,6 +94,7 @@ impl<'r> FromRequest<'r> for AuthGuard {
             return Outcome::Error((Status::Unauthorized, ()));
           }
           Outcome::Success(AuthGuard {
+            session_id: session_id.to_string(),
             username: account.username,
             display_name: account.display_name,
             perms: account.perms,
