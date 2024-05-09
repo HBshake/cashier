@@ -20,7 +20,7 @@ export function useRequest<T>(path: string):
 
     }
     void load();
-  }, [cashierApi.currentSession]);
+  }, []);
 
   return [val, setVal, error];
 }
