@@ -62,28 +62,24 @@ export default function RawMaterialPage() {
   );
 
   return (
-    <>
-      <Stack direction='column' gap={2}>
-        <Typography variant='h4'>Matières Premières</Typography>
-        <Stack direction='row' gap={2}>
-          <TextField
-            label='Rechercher'
-            sx={{ flexGrow: 1 }}
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-          />
-          <Button onClick={() => navigate("add")}>
-            <AddIcon />
-          </Button>
-        </Stack>
-        <Box sx={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={filteredRawMaterials}
-            columns={columns}
-            disableRowSelectionOnClick
-          />
-        </Box>
+    <Stack direction='column' gap={2}>
+      <Typography variant='h4'>Matières Premières</Typography>
+      <Stack direction='row' gap={2}>
+        <TextField
+          label='Rechercher par Nom'
+          sx={{ flexGrow: 1 }}
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        />
+        <Button onClick={() => navigate("add")}>
+          <AddIcon />
+        </Button>
       </Stack>
-    </>
+      <DataGrid
+        rows={filteredRawMaterials}
+        columns={columns}
+        disableRowSelectionOnClick
+      />
+    </Stack>
   );
 }

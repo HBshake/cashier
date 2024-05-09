@@ -22,7 +22,7 @@ export const cashierApi = {
       }
     });
   },
-  async post<T>(path: string) {
+  async post<T>(path: string, body: any) {
     const accessToken = await configGet("access_token");
     const session = await configGet("session");
     if(!accessToken) {
@@ -38,7 +38,8 @@ export const cashierApi = {
       headers: {
         "X-Access-Token": accessToken ?? "",
         "X-Session": session ?? "",
-      }
+      },
+      body: Body.json(body)
     });
   },
   async verifyAccessToken(token: string): Promise<boolean> {

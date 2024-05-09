@@ -51,7 +51,7 @@ export default function StockPage() {
       <Typography variant='h4'>Locaux</Typography>
       <Stack direction='row' gap={2}>
         <TextField
-          label='Rechercher'
+          label='Rechercher par Nom'
           sx={{ flexGrow: 1 }}
           value={filter}
           onChange={e => setFilter(e.target.value)}

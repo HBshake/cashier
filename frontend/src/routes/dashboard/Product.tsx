@@ -10,14 +10,7 @@ import { useRequest } from "../../hooks/req";
 import AddIcon from "@mui/icons-material/Add";
 import { useState } from "react";
 import dayjs from "dayjs";
-
-type Product = {
-  id: number;
-  name: string;
-  barcode: number;
-  price: number;
-  created_at: string;
-};
+import { Product } from "../../models/product";
 
 const columns: GridColDef<Product>[] = [
   {
@@ -65,26 +58,24 @@ export default function ProductPage() {
   );
 
   return (
-    <>
-      <Stack direction='column' gap={2}>
-        <Typography variant='h4'>Produits</Typography>
-        <Stack direction='row' gap={2}>
-          <TextField
-            label='Rechercher'
-            sx={{ flexGrow: 1 }}
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-          />
-          <Button>
-            <AddIcon />
-          </Button>
-        </Stack>
-        <DataGrid
-          rows={filteredProducts}
-          columns={columns}
-          disableRowSelectionOnClick
+    <Stack direction='column' gap={2}>
+      <Typography variant='h4'>Produits</Typography>
+      <Stack direction='row' gap={2}>
+        <TextField
+          label='Rechercher par Nom/Barcode'
+          sx={{ flexGrow: 1 }}
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
         />
+        <Button>
+          <AddIcon />
+        </Button>
       </Stack>
-    </>
+      <DataGrid
+        rows={filteredProducts}
+        columns={columns}
+        disableRowSelectionOnClick
+      />
+    </Stack>
   );
 }

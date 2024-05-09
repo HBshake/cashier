@@ -68,7 +68,7 @@ export default function TransactionPage() {
       <Typography variant='h4'>Transactions</Typography>
       <Stack direction='row' gap={2}>
         <TextField
-          label='Rechercher un Local'
+          label='Rechercher par ID'
           value={filter}
           onChange={e => setFilter(e.target.value)}
           sx={{ flexGrow: 1 }}
