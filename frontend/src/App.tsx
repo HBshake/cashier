@@ -25,6 +25,7 @@ import { SnackbarProvider } from "notistack";
 import StockPage from "./routes/dashboard/Stock";
 import TransactionPage from "./routes/dashboard/Transaction";
 import CustomerAddPage from "./routes/dashboard/CustomerAdd";
+import ProductAddPage from "./routes/dashboard/ProductAdd";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -46,6 +47,7 @@ const router = createBrowserRouter(
         <Route path='stock' element={<StockPage />} />
         <Route path='transaction' element={<TransactionPage />} />
         <Route path='customer/add' element={<CustomerAddPage />} />
+        <Route path='product/add' element={<ProductAddPage />} />
       </Route>
     </Route>,
   ]),

@@ -1,6 +1,6 @@
 use crate::{data::customer::Customer, db, guards::AuthGuard};
 use rocket::{
-  response::status::{Accepted, BadRequest, Created},
+  response::status::{Accepted, BadRequest},
   serde::json::Json,
   Route,
 };

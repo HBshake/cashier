@@ -1,6 +1,7 @@
 use crate::data::product::{ProductDetail, RawMaterialInProduct};
 use crate::db;
 use crate::{data::product::Product, guards::AuthGuard};
+use rocket::response::status::{Accepted, BadRequest};
 use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +30,15 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Product>> {
 }
 
 #[post("/", format = "json", data = "<input>")]
-async fn create(input: Json<CreateProductInput>) -> Status {
+async fn create(
+  input: Json<CreateProductInput>,
+) -> Result<Accepted<()>, BadRequest<String>> {
+  if input.name.is_empty() {
+    return Err(BadRequest("Nom Invalide".into()));
+  }
+  if input.price <= 0.0 {
+    return Err(BadRequest("Prix Invalide".into()));
+  }
   let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO product 
@@ -42,7 +51,7 @@ async fn create(input: Json<CreateProductInput>) -> Status {
   .execute(&mut *connection)
   .await
   .unwrap();
-  Status::Created
+  Ok(Accepted(()))
 }
 
 #[get("/<product_id>")]

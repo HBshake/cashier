@@ -67,7 +67,7 @@ export default function ProductPage() {
           value={filter}
           onChange={e => setFilter(e.target.value)}
         />
-        <Button>
+        <Button href="product/add">
           <AddIcon />
         </Button>
       </Stack>
