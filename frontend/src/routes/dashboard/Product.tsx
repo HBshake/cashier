@@ -1,101 +1,81 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useRequest } from "../../hooks/req";
+import AddIcon from "@mui/icons-material/Add";
+import { useState } from "react";
+import dayjs from "dayjs";
+import { Product } from "../../models/product";
 
-const columns: GridColDef<(typeof rows)[number]>[] = [
-  { field: "id", headerName: "ID", width: 90, sortable: false },
+const columns: GridColDef<Product>[] = [
+  {
+    field: "id",
+    headerName: "ID",
+    flex: 1,
+  },
   {
     field: "name",
     headerName: "Produit",
-    width: 150,
     type: "string",
-    editable: true,
-    sortable: false,
+    flex: 4,
   },
   {
-    field: "code",
+    field: "barcode",
     headerName: "Barcode",
-    width: 110,
     type: "number",
-    editable: true,
-    sortable: false,
+    flex: 2,
   },
   {
     field: "price",
     headerName: "Prix",
     type: "number",
-    width: 110,
-    editable: true,
-    sortable: false,
+    flex: 1,
   },
   {
-    field: "stock",
-    headerName: "Stock",
-    type: "string",
-    width: 100,
-    editable: true,
-    sortable: false,
+    field: "created_at",
+    headerName: "Ajouté le",
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
+    flex: 2,
   },
-  {
-    field: "rawmat",
-    headerName: "Matières Premières",
-    type: "string",
-    width: 140,
-    editable: true,
-    sortable: false,
-  },
-  {
-    field: "creation_date",
-    headerName: "Crée le",
-    type: "date",
-    sortable: false,
-    width: 150,
-  },
-  {
-    field: "who",
-    headerName: "Par",
-    type: "string",
-    sortable: false,
-    width: 150,
-  },
-  {
-    field: "modified",
-    headerName: "Modifié le",
-    type: "date",
-    sortable: false,
-    width: 150,
-  },
-];
-
-const rows = [
-  { id: 1, name: "tartelette", code: "1111", price: "20", creation_date: "", stock:"button", rawmat:"button", who:"yomama" },
 ];
 
 export default function ProductPage() {
+  const [products] = useRequest<Product[]>("/product");
+  const [filter, setFilter] = useState("");
+  if (!products) {
+    return <CircularProgress />;
+  }
+
+  const filteredProducts = products.filter(
+    r =>
+      r.name.toLowerCase().includes(filter.toLowerCase()) ||
+      r.barcode.toString().includes(filter),
+  );
+
   return (
-    <>
+    <Stack direction='column' gap={2}>
       <Typography variant='h4'>Produits</Typography>
-      <Stack direction='column'>
-        <Stack direction='row' gap={2}>
-          <TextField label='Rechercher' sx={{ flexGrow: 1 }} />
-          <Button>Ajouter un produit</Button>
-        </Stack>
-      </Stack>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
-            },
-          }}
-          pageSizeOptions={[5]}
-          checkboxSelection
-          disableRowSelectionOnClick
+      <Stack direction='row' gap={2}>
+        <TextField
+          label='Rechercher par Nom/Barcode'
+          sx={{ flexGrow: 1 }}
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
         />
-      </Box>
-    </>
+        <Button>
+          <AddIcon />
+        </Button>
+      </Stack>
+      <DataGrid
+        rows={filteredProducts}
+        columns={columns}
+        disableRowSelectionOnClick
+      />
+    </Stack>
   );
 }

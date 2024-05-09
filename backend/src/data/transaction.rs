@@ -50,6 +50,7 @@ pub struct TransactionDetail {
 #[derive(Serialize, Deserialize)]
 pub struct ProductInTransaction {
   pub id: i32,
+  pub name: String,
   pub unit_price: f64,
   pub count: i32,
   pub total_price: f64,

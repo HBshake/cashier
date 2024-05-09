@@ -23,6 +23,7 @@ import { cashierApi } from "./utils/api";
 import AccessPage from "./routes/config/Access";
 import { SnackbarProvider } from "notistack";
 import StockPage from "./routes/dashboard/Stock";
+import TransactionPage from "./routes/dashboard/Transaction";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
         <Route path='product' element={<ProductPage />} />
         <Route path='shop' element={<ShopPage />} />
         <Route path='stock' element={<StockPage />} />
+        <Route path="transaction" element={<TransactionPage />} />
       </Route>
     </Route>,
   ]),

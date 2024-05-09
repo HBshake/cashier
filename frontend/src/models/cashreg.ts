@@ -7,39 +7,32 @@ export function useTransactionItemsDataGrid(): GridColDef[] {
   return useMemo(
     () => [
       {
-        field: "prodId",
+        field: "id",
         headerName: dict.common.dataModel.id,
-        sortable: false,
-      },
-      {
-        field: "prodName",
-        headerName: dict.common.dataModel.name,
         flex: 1,
-        sortable: false,
       },
       {
-        field: "prodPrice",
+        field: "name",
+        headerName: dict.common.dataModel.name,
+        flex: 4,
+      },
+      {
+        field: "unit_price",
         headerName: dict.transactions.item.price,
         type: "number",
-        flex: 1,
-        editable: true,
-        sortable: false,
+        flex: 2,
       },
       {
-        field: "quantity",
+        field: "count",
         headerName: dict.transactions.item.quantity,
         type: "number",
         flex: 1,
-        editable: true,
-        sortable: false,
       },
       {
-        field: "totalPrice",
+        field: "total_price",
         headerName: dict.transactions.item.totalPrice,
         type: "number",
-        flex: 1,
-        editable: true,
-        sortable: false,
+        flex: 2,
       },
     ],
     [

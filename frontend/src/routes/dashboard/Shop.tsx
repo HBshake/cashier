@@ -1,68 +1,70 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useRequest } from "../../hooks/req";
+import dayjs from "dayjs";
+import { useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
 
-const columns: GridColDef<(typeof rows)[number]>[] = [
-  { field: "id", headerName: "ID", width: 90, sortable: false },
+type Shop = {
+  id: number;
+  name: string;
+  stock: string;
+  creation_date: string;
+};
+
+const columns: GridColDef<Shop>[] = [
+  {
+    field: "id",
+    headerName: "ID",
+    flex: 1,
+  },
   {
     field: "name",
     headerName: "Nom",
-    width: 350,
-    type: "string",
-    editable: true,
-    sortable: false,
+    flex: 4,
   },
   {
-    field: "stock",
-    headerName: "Stock",
-    type: "string",
-    width: 150,
-    editable: true,
-    sortable: false,
-  },
-  {
-    field: "creation_date",
+    field: "created_at",
     headerName: "Crée le",
-    type: "date",
-    sortable: false,
-    width: 200,
-  },
-];
-
-const rows = [
-  {
-    id: 1,
-    name: "Bernoussi",
-    creation_date: "",
-    stock: "button",
+    flex: 2,
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
   },
 ];
 
 export default function StockPage() {
+  const [shops] = useRequest<Shop[]>("/shop");
+  const [filter, setFilter] = useState("");
+  if (!shops) {
+    return <CircularProgress />;
+  }
+
+  const filteredShops = shops.filter(shop => shop.name.includes(filter));
+
   return (
-    <>
+    <Stack direction='column' gap={2}>
       <Typography variant='h4'>Locaux</Typography>
-      <Stack direction='column'>
-        <Stack direction='row' gap={2}>
-          <TextField label='Rechercher' sx={{ flexGrow: 1 }} />
-          <Button>Ajouter un local</Button>
-        </Stack>
-      </Stack>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
-            },
-          }}
-          pageSizeOptions={[5]}
-          checkboxSelection
-          disableRowSelectionOnClick
+      <Stack direction='row' gap={2}>
+        <TextField
+          label='Rechercher par Nom'
+          sx={{ flexGrow: 1 }}
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
         />
-      </Box>
-    </>
+        <Button>
+          <AddIcon />
+        </Button>
+      </Stack>
+      <DataGrid
+        rows={filteredShops}
+        columns={columns}
+        disableRowSelectionOnClick
+      />
+    </Stack>
   );
 }

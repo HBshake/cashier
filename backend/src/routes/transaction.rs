@@ -46,7 +46,7 @@ async fn detail(_auth: AuthGuard, id: i32) -> Json<TransactionDetail> {
 
   let products = sqlx::query_as!(
     ProductInTransaction,
-    r#"SELECT pit.product_id AS id, pit.unit_price, pit.count, pit.total_price
+    r#"SELECT pit.product_id AS id, pit.name, pit.unit_price, pit.count, pit.total_price
       FROM product_in_transaction pit
       WHERE pit.transaction_id = $1"#,
     id
@@ -92,10 +92,11 @@ async fn create(
   for product in &input.products {
     sqlx::query!(
       r#"INSERT INTO product_in_transaction 
-      (product_id, transaction_id, unit_price, count, total_price) 
-      VALUES ($1, $2, $3, $4, $5)"#,
+      (product_id, transaction_id, name, unit_price, count, total_price) 
+      VALUES ($1, $2, $3, $4, $5, $6)"#,
       product.id,
       transaction.id,
+      product.name,
       product.unit_price,
       product.count,
       product.total_price

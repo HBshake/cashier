@@ -33,7 +33,9 @@ import {
   Warehouse,
 } from "@mui/icons-material";
 import { useDict } from "../hooks/locale";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Session, cashierApi } from "../utils/api";
+import { useEffect, useState } from "react";
 
 export const DRAWER_WIDTH = 240;
 export const TOOLBAR_HEIGHTS = ["48px", "56px", "64px"];
@@ -88,7 +90,7 @@ const nav: NavDestination[] = [
   {
     name: "transactions",
     icon: ConfirmationNumber,
-    route: "transactions",
+    route: "transaction",
   },
 ];
 
@@ -101,15 +103,29 @@ const bottomNav: NavDestination[] = [
 ];
 
 export default function DashboardLayout() {
+  const navigate = useNavigate();
   const dict = useDict();
 
-  const cashier = {
-    displayName: "Hiba"
-  };
+  const [session, setSession] = useState<Session | null>(null);
 
+  useEffect(() => {
+    async function load() {
+      setSession(await cashierApi.session());
+    }
+    void load();
+  }, []);
+
+  const logout = async () => {
+    await cashierApi.logout();
+    navigate("/");
+  }
+
+  if (!session) {
+    return <></>;
+  }
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar position='fixed'>
         <Toolbar
           sx={{
             backgroundColor: "background.paper",
@@ -118,8 +134,8 @@ export default function DashboardLayout() {
         >
           <Box>
             <Button
-              href="/dashboard"
-              variant="text"
+              href='/dashboard'
+              variant='text'
               disableRipple
               startIcon={
                 <DashboardIcon
@@ -131,14 +147,14 @@ export default function DashboardLayout() {
                 typography: { textTransform: "none" },
               }}
             >
-              <Typography variant="h6" noWrap component="div" color="black">
+              <Typography variant='h6' noWrap component='div' color='black'>
                 {dict.dashboard.title}
               </Typography>
             </Button>
           </Box>
-          <Stack direction="row" alignItems="center" gap={1}>
-            <Typography variant="h6">{cashier.displayName}</Typography>
-            <IconButton>
+          <Stack direction='row' alignItems='center' gap={1}>
+            <Typography variant='h6'>{session.display_name}</Typography>
+            <IconButton onClick={logout}>
               <LogoutIcon />
             </IconButton>
           </Stack>
@@ -156,13 +172,13 @@ export default function DashboardLayout() {
             bottom: 0,
           },
         }}
-        variant="permanent"
-        anchor="left"
+        variant='permanent'
+        anchor='left'
       >
         <Divider />
         <List>
           {nav
-//            .filter(({ perms }) => cashierHasPerms(cashier, perms))
+            //            .filter(({ perms }) => cashierHasPerms(cashier, perms))
             .map(({ name, icon: Icon, route }) => (
               <ListItem key={name} disablePadding>
                 <ListItemButton component={Link} href={`/dashboard/${route}`}>
@@ -177,7 +193,7 @@ export default function DashboardLayout() {
         <Divider sx={{ mt: "auto" }} />
         <List>
           {bottomNav
-//            .filter(({ perms }) => cashierHasPerms(cashier, perms))
+            //            .filter(({ perms }) => cashierHasPerms(cashier, perms))
             .map(({ name, icon: Icon, route }) => (
               <ListItem key={name} disablePadding>
                 <ListItemButton component={Link} href={`/dashboard/${route}`}>
@@ -191,7 +207,7 @@ export default function DashboardLayout() {
         </List>
       </Drawer>
       <Box
-        component="main"
+        component='main'
         sx={{
           flexGrow: 1,
           bgcolor: "background.default",
@@ -199,7 +215,7 @@ export default function DashboardLayout() {
           mt: TOOLBAR_HEIGHTS,
           p: CONTENT_PADDING,
           overflow: "scroll2",
-          minHeight: TOOLBAR_HEIGHTS.map((h) => `calc(100vh - ${h})`),
+          minHeight: TOOLBAR_HEIGHTS.map(h => `calc(100vh - ${h})`),
         }}
       >
         <Outlet />

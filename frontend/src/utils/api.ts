@@ -1,15 +1,22 @@
 import { Body, ResponseType, fetch } from "@tauri-apps/api/http";
 import { SERVER_URL } from "./env";
-import { configGet, configSet } from "./config";
+import { configGet, configSet, configUnset } from "./config";
+
+export type Session = {
+  session_id: string;
+  username: string;
+  display_name: string;
+  perms: string[];
+};
 
 export const cashierApi = {
   async get<T>(path: string) {
     const accessToken = await configGet("access_token");
-    const session = await configGet("session");
-    if(!accessToken) {
+    const session = await this.session();
+    if (!accessToken) {
       console.warn("Making request without an access token");
     }
-    if(!session) {
+    if (!session) {
       console.warn("Making request without having a session");
     }
     const url = new URL(path, SERVER_URL).href;
@@ -18,17 +25,17 @@ export const cashierApi = {
       responseType: ResponseType.JSON,
       headers: {
         "X-Access-Token": accessToken ?? "",
-        "X-Session": session ?? "",
+        "X-Session": session?.session_id ?? "",
       }
     });
   },
-  async post<T>(path: string) {
+  async post<T>(path: string, body: any) {
     const accessToken = await configGet("access_token");
-    const session = await configGet("session");
-    if(!accessToken) {
+    const session = await this.session();
+    if (!accessToken) {
       console.warn("Making request without an access token");
     }
-    if(!session) {
+    if (!session) {
       console.warn("Making request without having a session");
     }
     const url = new URL(path, SERVER_URL).href;
@@ -37,8 +44,9 @@ export const cashierApi = {
       responseType: ResponseType.JSON,
       headers: {
         "X-Access-Token": accessToken ?? "",
-        "X-Session": session ?? "",
-      }
+        "X-Session": session?.session_id ?? "",
+      },
+      body: Body.json(body)
     });
   },
   async verifyAccessToken(token: string): Promise<boolean> {
@@ -51,7 +59,7 @@ export const cashierApi = {
         })
       });
       return response.status === 200;
-    } catch(e) {
+    } catch (e) {
       return false;
     }
   },
@@ -59,7 +67,7 @@ export const cashierApi = {
     try {
       const url = new URL("/auth/login", SERVER_URL).href;
       const accessToken = await configGet("access_token");
-      if(!accessToken) {
+      if (!accessToken) {
         console.warn("Logging in without an access token");
       }
       const response = await fetch<string>(url, {
@@ -73,13 +81,20 @@ export const cashierApi = {
         }
       });
 
-      if(response.status !== 200) {
+      if (response.status !== 200) {
         return false;
       }
-      await configSet("session", response.data);
+      await configSet("session", JSON.stringify(response.data));
       return true;
-    } catch(e) {
+    } catch (e) {
       return false;
     }
+  },
+  async logout() {
+    await this.get("/auth/logout");
+    await configUnset("session");
+  },
+  async session(): Promise<Session | null> {
+    return JSON.parse(await configGet("session") ?? "null") as Session | null;
   }
 };
