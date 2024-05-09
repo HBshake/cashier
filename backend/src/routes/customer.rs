@@ -1,5 +1,9 @@
 use crate::{data::customer::Customer, db, guards::AuthGuard};
-use rocket::{http::Status, serde::json::Json, Route};
+use rocket::{
+  response::status::{Accepted, BadRequest, Created},
+  serde::json::Json,
+  Route,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -23,7 +27,14 @@ async fn list(_auth: AuthGuard) -> Json<Vec<Customer>> {
 }
 
 #[post("/", format = "json", data = "<input>")]
-async fn create(_auth: AuthGuard, input: Json<CreateCustomerInput>) -> Status {
+async fn create(
+  _auth: AuthGuard,
+  input: Json<CreateCustomerInput>,
+) -> Result<Accepted<()>, BadRequest<String>> {
+  if input.name.is_empty() {
+    println!("Empty name");
+    return Err(BadRequest("Nom Invalide".into()));
+  }
   let mut connection = db::get_connection().await;
   sqlx::query!(
     r#"INSERT INTO customer 
@@ -40,7 +51,7 @@ async fn create(_auth: AuthGuard, input: Json<CreateCustomerInput>) -> Status {
   .await
   .unwrap();
 
-  Status::Created
+  Ok(Accepted(()))
 }
 
 pub(super) fn customer_routes() -> Vec<Route> {

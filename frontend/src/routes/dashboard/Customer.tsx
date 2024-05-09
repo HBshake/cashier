@@ -15,19 +15,22 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
 import { creationTime } from "../../utils/format";
 import { useRequest } from "../../hooks/req";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function CustomerPage() {
-  const [customers,] = useRequest<Customer[]>("/customer");
+  const [customers] = useRequest<Customer[]>("/customer");
 
-  if(!customers) {
-    return <CircularProgress />
+  if (!customers) {
+    return <CircularProgress />;
   }
 
   return (
-    <Stack direction='column'>
+    <Stack direction='column' gap={2}>
       <Stack direction='row' gap={2}>
         <TextField label='Rechercher' sx={{ flexGrow: 1 }} />
-        <Button>Ajouter un client</Button>
+        <Button href="customer/add">
+          <AddIcon />
+        </Button>
       </Stack>
 
       <List
@@ -50,7 +53,7 @@ function CustomerRow({ customer }: { customer: Customer }) {
   };
   return (
     <ListItem>
-      <Stack direction='column' sx={{width: "100%"}}>
+      <Stack direction='column' sx={{ width: "100%" }}>
         <ListItemButton onClick={handleClick}>
           <ListItemIcon>
             <PersonIcon />
