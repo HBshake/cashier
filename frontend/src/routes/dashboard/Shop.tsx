@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   CircularProgress,
   Stack,
@@ -34,8 +33,7 @@ const columns: GridColDef<Shop>[] = [
     field: "created_at",
     headerName: "Crée le",
     flex: 2,
-    valueFormatter: ({ value }) =>
-      dayjs(value as string).format("DD/MM/YYYY HH:mm:ss"),
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
   },
 ];
 

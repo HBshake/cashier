@@ -45,8 +45,7 @@ const columns: GridColDef<RawMaterial>[] = [
   {
     field: "created_at",
     headerName: "Ajouté le",
-    valueFormatter: ({ value }) =>
-      dayjs(value as string).format("DD/MM/YYYY HH:mm:ss"),
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
     flex: 1,
   },
 ];
@@ -58,9 +57,8 @@ export default function RawMaterialPage() {
   if (!rawMaterials) {
     return <CircularProgress />;
   }
-  const filteredRawMaterials = rawMaterials.filter(
-    r =>
-      r.name.toLowerCase().includes(filter.toLowerCase())
+  const filteredRawMaterials = rawMaterials.filter(r =>
+    r.name.toLowerCase().includes(filter.toLowerCase()),
   );
 
   return (

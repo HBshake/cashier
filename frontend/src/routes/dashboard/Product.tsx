@@ -46,8 +46,7 @@ const columns: GridColDef<Product>[] = [
   {
     field: "created_at",
     headerName: "Ajouté le",
-    valueFormatter: ({ value }) =>
-      dayjs(value as string).format("DD/MM/YYYY HH:mm:ss"),
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
     flex: 2,
   },
 ];
