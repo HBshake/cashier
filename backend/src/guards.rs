@@ -48,10 +48,10 @@ impl<'r> FromRequest<'r> for AccessGuard {
 
 #[derive(Clone)]
 pub struct AuthGuard {
-  username: String,
-  display_name: String,
-  perms: Vec<String>,
-  token: String,
+  pub username: String,
+  pub display_name: String,
+  pub perms: Vec<String>,
+  pub token: String,
 }
 
 #[rocket::async_trait]

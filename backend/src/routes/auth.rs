@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json, Route};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{data::auth::StrippedAccount, db, guards::AccessGuard};
+use crate::{data::auth::{Session, StrippedAccount}, db, guards::{AccessGuard, AuthGuard}};
 
 #[derive(Deserialize)]
 struct AccessInput {
@@ -95,6 +95,20 @@ async fn list(_access: AccessGuard) -> Json<Vec<StrippedAccount>> {
   Json::from(accounts)
 }
 
+#[get("/session")]
+async fn sessions(auth: AuthGuard) -> Json<Vec<Session>> {
+  let mut connection = db::get_connection().await;
+  let sessions = sqlx::query_as!(
+    Session,
+    "SELECT id, account_username, login_time, logout_time FROM session WHERE account_username = $1",
+    auth.username
+  )
+  .fetch_all(&mut *connection)
+  .await
+  .unwrap();
+  Json::from(sessions)
+}
+
 pub(super) fn auth_routes() -> Vec<Route> {
-  routes![access, login, list]
+  routes![access, login, list, sessions]
 }

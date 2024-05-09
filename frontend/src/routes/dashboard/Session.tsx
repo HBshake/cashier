@@ -1,55 +1,62 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
+import { Session, cashierApi } from "../../utils/api";
+import { useRequest } from "../../hooks/req";
+import dayjs from "dayjs";
 
-const columns: GridColDef<(typeof rows)[number]>[] = [
+type HistoricalSession = {
+  // Sql to typescript
+  id: string;
+  account_username: string;
+  login_time: string;
+  logout_time: string | null;
+};
+
+const columns: GridColDef<HistoricalSession>[] = [
   {
-    field: "start",
-    headerName: "Début",
-    type: "date",
-    sortable: false,
-    width: 500,
+    field: "id",
+    headerName: "ID",
+    flex: 1,
   },
   {
-    field: "finish",
-    headerName: "Fin",
-    type: "date",
-    sortable: false,
-    width: 500,
+    field: "login_time",
+    headerName: "Connexion",
+    flex: 2,
+    valueFormatter: value => dayjs(value).format("DD/MM/YYYY HH:mm:ss"),
   },
   {
-    field: "button",
-    headerName: "-",
-    type: "string",
-    sortable: false,
-    width: 500,
+    field: "logout_time",
+    headerName: "Déconnexion",
+    flex: 2,
+    valueFormatter: value =>
+      value ? dayjs(value).format("DD/MM/YYYY HH:mm:ss") : "-",
   },
 ];
 
-const rows = [{ id: 1, start: "", finish: "", button: "Help" }];
-
 export default function SessionPage() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [sessions] = useRequest<HistoricalSession[]>("/auth/session");
+
+  useEffect(() => {
+    async function load() {
+      setSession(await cashierApi.session());
+    }
+    void load();
+  }, []);
+
+  if (!session) {
+    return <></>;
+  }
+  if (!sessions) {
+    return <CircularProgress />;
+  }
   return (
-    <>
-      <Stack direction='column'>
-        <Stack direction='row' gap={70}>
-          <Typography variant='h4'>Session de -inserer chkon hna-</Typography>
-          <Button>Établir un état de trésorerie</Button>
-        </Stack>
+    <Stack direction='column' gap={2}>
+      <Stack direction='row' gap={70}>
+        <Typography variant='h4'>Sessions de {session.display_name}</Typography>
       </Stack>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
-            },
-          }}
-          pageSizeOptions={[5]}
-        />
-      </Box>
-    </>
+      <DataGrid rows={sessions} columns={columns} disableRowSelectionOnClick />
+    </Stack>
   );
 }

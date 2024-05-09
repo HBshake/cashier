@@ -89,7 +89,7 @@ CREATE TABLE access_token (
 );
 CREATE TABLE session (
     id TEXT PRIMARY KEY,
-    account_username TEXT REFERENCES account(username),
+    account_username TEXT REFERENCES account(username) NOT NULL,
     login_time TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     logout_time TIMESTAMP(3) WITHOUT TIME ZONE
 );
